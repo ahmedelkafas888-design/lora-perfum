@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Collection | LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <header>
+        <div class="nav-container">
+            <div class="lang-switch-wrapper">
+                <button onclick="toggleLanguageSystem()" class="lang-toggle-btn" id="lang-btn">العربية</button>
+            </div>
+            <a href="index.html" class="logo">LORA</a>
+            <div class="nav-icons">
+                <a href="admin.html" class="nav-admin-icon">⚙️</a>
+                <a href="cart.html" class="cart-icon-wrapper">
+                    🛒 <span id="cart-badge" class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+        <nav class="sub-nav-menu">
+            <a href="index.html" data-i18n="nav_home">Home</a>
+            <a href="products.html?category=all" id="nav-all" data-i18n="nav_collection">Collection</a>
+            <a href="products.html?category=Women" id="nav-women" data-i18n="nav_women">Women Line</a>
+            <a href="products.html?category=Men" id="nav-men" data-i18n="nav_men">Men Line</a>
+        </nav>
+    </header>
+
+    <section class="page-title">
+        <h1 id="catalog-title" data-i18n="catalog_header">The Master Collection</h1>
+        <p data-i18n="catalog_subheader">Pure extracts, timeless definitions</p>
+    </section>
+
+    <section class="container filter-search-wrapper-panel">
+        <div class="search-box-container">
+            <input type="text" id="search-input" placeholder="Search our delicate formulations..." oninput="executeMatrixFiltering()" data-i18n-holder="search_placeholder">
+        </div>
+        
+        <div class="filter-controls-matrix">
+            <div class="filter-group-unit">
+                <label data-i18n="filter_cat">Category</label>
+                <select id="filter-category" onchange="executeMatrixFiltering()">
+                    <option value="all" data-i18n="opt_all_cats">All Classifications</option>
+                    <option value="Women" data-i18n="opt_women">Women Line</option>
+                    <option value="Men" data-i18n="opt_men">Men Line</option>
+                </select>
+            </div>
+
+            <div class="filter-group-unit">
+                <label data-i18n="filter_avail">Availability</label>
+                <select id="filter-stock" onchange="executeMatrixFiltering()">
+                    <option value="all" data-i18n="opt_all_avail">All Statuses</option>
+                    <option value="In Stock" data-i18n="stock_in">In Stock</option>
+                    <option value="Low Stock" data-i18n="stock_low">Low Stock</option>
+                    <option value="Sold Out" data-i18n="stock_out">Sold Out</option>
+                </select>
+            </div>
+
+            <div class="filter-group-unit">
+                <label data-i18n="filter_price">Price Sequence</label>
+                <select id="filter-sort" onchange="executeMatrixFiltering()">
+                    <option value="default" data-i18n="opt_default_sort">Standard Reference</option>
+                    <option value="low-high" data-i18n="opt_low_high">Low To High</option>
+                    <option value="high-low" data-i18n="opt_high_low">High To Low</option>
+                </select>
+            </div>
+
+            <div class="filter-group-unit checkbox-luxe-align">
+                <input type="checkbox" id="filter-discount-only" onchange="executeMatrixFiltering()">
+                <label for="filter-discount-only" data-i18n="filter_discount_only">Discounted Only</label>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div id="catalog-grid" class="products-grid"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 LORA. <span data-i18n="footer_rights">All Rights Reserved.</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            applyLanguageDOM();
+            updateCartBadge();
+            
+            // Capture initial entry parameters if configured via category menu landing links
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialCategory = urlParams.get('category') || 'all';
+            
+            if (initialCategory !== 'all') {
+                document.getElementById('filter-category').value = initialCategory;
+            }
+            
+            executeMatrixFiltering();
+        });
+
+        function executeMatrixFiltering() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const catSelection = document.getElementById('filter-category').value;
+            const stockSelection = document.getElementById('filter-stock').value;
+            const sortSelection = document.getElementById('filter-sort').value;
+            const discountOnly = document.getElementById('filter-discount-only').checked;
+            
+            let dataset = getProducts();
+
+            // 1. Text Query Intersection
+            if (query !== '') {
+                dataset = dataset.filter(p => p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query));
+            }
+
+            // 2. Category Verification Range
+            if (catSelection !== 'all') {
+                dataset = dataset.filter(p => p.category.toLowerCase() === catSelection.toLowerCase());
+            }
+
+            // 3. Stock Level Allocations
+            if (stockSelection !== 'all') {
+                dataset = dataset.filter(p => {
+                    const level = p.stockStatus || 'In Stock';
+                    return level === stockSelection;
+                });
+            }
+
+            // 4. Exclusively Discount Markdown Assertions
+            if (discountOnly) {
+                dataset = dataset.filter(p => parseInt(p.discount || 0) > 0);
+            }
+
+            // 5. Price Sequence Sort
+            if (sortSelection === 'low-high') {
+                dataset.sort((a,b) => calculateFinalPrice(a.price, a.discount) - calculateFinalPrice(b.price, b.discount));
+            } else if (sortSelection === 'high-low') {
+                dataset.sort((a,b) => calculateFinalPrice(b.price, b.discount) - calculateFinalPrice(a.price, a.discount));
+            }
+
+            // Rendering operations pipeline
+            const targetGrid = document.getElementById('catalog-grid');
+            targetGrid.innerHTML = '';
+
+            if (dataset.length === 0) {
+                targetGrid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 5rem 0; font-style: italic; color:#888;" data-i18n="no_results">No exquisite formulations found matching criteria.</p>`;
+                applyLanguageDOM();
+                return;
+            }
+
+            dataset.forEach(product => {
+                targetGrid.innerHTML += createProductCard(product);
+            });
+            applyLanguageDOM();
+        }
+    </script>
+</body>
+</html>
