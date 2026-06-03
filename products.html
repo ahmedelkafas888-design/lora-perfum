@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LORA | Products Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="toast-container" class="toast-container"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="products.html?cat=men" class="nav-link" data-i18n="navMen">Men</a>
+                <a href="products.html?cat=women" class="nav-link" data-i18n="navWomen">Women</a>
+            </div>
+            <div class="nav-logo">
+                <a href="index.html" class="logo-brand">LORA</a>
+            </div>
+            <div class="nav-right">
+                <a href="cart.html" class="nav-link cart-link">
+                    <span data-i18n="navCart">Cart</span>
+                    <span id="cart-count" class="cart-count-badge">0</span>
+                </a>
+                <a href="admin.html" class="nav-link" data-i18n="navAdmin">Admin</a>
+                <button id="lang-toggle" class="lang-switch-btn">العربية</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="search-section">
+        <div class="container">
+            <div class="search-wrapper">
+                <input type="text" id="global-search" data-i18n-placeholder="searchPlaceholder" placeholder="Search for luxury fragrances...">
+                <button id="global-search-btn" class="search-btn" data-i18n="searchBtn">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content container">
+        <div class="section-header">
+            <h2 id="catalogue-title" data-i18n="catalogueTitle">Our Fragrance Catalogue</h2>
+            <div class="header-line"></div>
+        </div>
+        
+        <div id="catalog-products-grid" class="products-grid">
+            <!-- Loaded dynamically via app.js -->
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 LORA. All Rights Reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+            App.renderCatalog();
+        });
+    </script>
+</body>
+</html>
