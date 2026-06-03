@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maison Dashboard Panel | LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="auth-screen" class="auth-modal">
+        <div class="auth-box">
+            <h2>Maison Verification Portal</h2>
+            <p>Access restricted strictly to verified operations managers.</p>
+            <input type="email" id="auth-email" placeholder="Administrative Email Profile">
+            <button class="btn" onclick="verifyAdminAccess()">Unlock Environment</button>
+            <div id="auth-error" class="error-msg">Authorization failure: Reference invalid</div>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="admin-layout" style="display: none;">
+        <aside class="admin-sidebar">
+            <div class="sidebar-brand">LORA CONTROL</div>
+            <ul class="sidebar-menu">
+                <li onclick="switchAdminTab('dashboard')" id="tab-dashboard" class="active">Dashboard Briefing</li>
+                <li onclick="switchAdminTab('products')" id="tab-products">Manage Products</li>
+                <li onclick="switchAdminTab('add-product')" id="tab-add-product">Formulate Asset</li>
+                <li onclick="switchAdminTab('coupons')" id="tab-coupons">Coupon Logic</li>
+                <li onclick="switchAdminTab('orders')" id="tab-orders">Order Ledgers</li>
+                <li onclick="switchAdminTab('settings')" id="tab-settings">System Settings</li>
+            </ul>
+            <a href="index.html" class="back-store-link">← Exit to Storefront</a>
+            <button class="logout-btn" onclick="logoutAdmin()">Terminate Session</button>
+        </aside>
+
+        <main class="admin-content">
+            <section id="content-dashboard" class="admin-section">
+                <h2>Executive Summary</h2>
+                <div class="metrics-row">
+                    <div class="metric-card"><h3 id="st-p">0</h3><p>Active SKUs</p></div>
+                    <div class="metric-card"><h3 id="st-o">0</h3><p>Processed Orders</p></div>
+                    <div class="metric-card"><h3 id="st-r">0 EGP</h3><p>Gross Value Tracked</p></div>
+                </div>
+            </section>
+
+            <section id="content-products" class="admin-section" style="display:none;">
+                <h2>Product Asset Management</h2>
+                <div class="admin-products-grid" id="admin-catalog-view"></div>
+            </section>
+
+            <section id="content-add-product" class="admin-section" style="display:none;">
+                <h2 id="form-action-title">Configure Product Entry</h2>
+                <form id="product-form" onsubmit="saveProduct(event)">
+                    <input type="hidden" id="prod-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Asset Formulation Name</label>
+                            <input type="text" id="prod-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bottle Size Capacity</label>
+                            <select id="prod-size">
+                                <option value="50ML">50 ML</option>
+                                <option value="100ML" selected>100 ML</option>
+                                <option value="150ML">150 ML</option>
+                                <option value="200ML">200 ML</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Binary Stream Media Reader (Image)</label>
+                            <input type="file" id="file-reader-input" accept="image/*" onchange="processBinaryImage(this)">
+                            <input type="hidden" id="prod-base64">
+                        </div>
+                        <div class="form-group text-center">
+                            <label>Preview Render Stream</label>
+                            <img id="form-preview" class="admin-form-img-preview" src="https://via.placeholder.com/150?text=No+Data" alt="Render Target">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Base Operational Pricing ($ USD)</label>
+                            <input type="number" step="0.01" id="prod-price" required oninput="calcFormEgp(this.value)">
+                            <small id="egp-label" style="color:var(--luxury-gold); margin-top:4px; font-weight:bold;">Base: 0 EGP</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Markdown Percentage Discount (%)</label>
+                            <input type="number" id="prod-discount" value="0" min="0" max="99">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Classification Track</label>
+                            <select id="prod-category" required>
+                                <option value="Women">Women Line</option>
+                                <option value="Men">Men Line</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Inventory Threshold Assignment</label>
+                            <select id="prod-stock" required>
+                                <option value="In Stock" selected>In Stock</option>
+                                <option value="Low Stock">Low Stock</option>
+                                <option value="Sold Out">Sold Out</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Olfactive Identity Composition</label>
+                        <textarea id="prod-description" rows="3" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Write to Local Database</button>
+                    <button type="button" class="btn" style="background:#333; color:#fff; border-color:#333;" onclick="clearAdminForm()">Reset Matrix Fields</button>
+                </form>
+            </section>
+
+            <section id="content-coupons" class="admin-section" style="display:none;">
+                <h2>Coupon Voucher Matrix</h2>
+                <form id="coupon-form" onsubmit="createCouponCode(event)" style="background:#1a1a1a; padding:1.5rem; margin-bottom:2rem; border:1px solid #2a2a2a;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Voucher Code String</label>
+                            <input type="text" id="cp-code" placeholder="e.g. EXTRA50" required style="background:#0a0a0a; color:#fff; border:1px solid #333;">
+                        </div>
+                        <div class="form-group">
+                            <label>Deduction Ratio (%)</label>
+                            <input type="number" id="cp-pct" min="1" max="100" required style="background:#0a0a0a; color:#fff; border:1px solid #333;">
+                        </div>
+                        <div class="form-group style-submit-align" style="justify-content: flex-end;">
+                            <button type="submit" class="btn" style="padding:0.9rem;">Generate Voucher</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <table class="orders-table">
+                    <thead>
+                        <tr><th>Code Reference</th><th>Markdown Value</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="coupon-table-rows"></tbody>
+                </table>
+            </section>
+
+            <section id="content-orders" class="admin-section" style="display:none;">
+                <h2>Logistics Vault Registry</h2>
+                <div style="overflow-x: auto;">
+                    <table class="orders-table">
+                        <thead>
+                            <tr><th>Order ID</th><th>Customer Info</th><th>Coupon Label</th><th>Sovereign Total</th></tr>
+                        </thead>
+                        <tbody id="orders-table-rows"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="content-settings" class="admin-section" style="display:none;">
+                <h2>System Configuration Constants</h2>
+                <div class="metric-card" style="text-align:left; max-width:600px;">
+                    <p style="margin-bottom:0.5rem;"><strong>System Framework Environment:</strong> Production Server Client Verified</p>
+                    <p style="margin-bottom:0.5rem;"><strong>Data Isolation Model:</strong> Browser Local Storage System Layer</p>
+                    <p style="margin-bottom:0.5rem;"><strong>Database Status:</strong> Online Synchronized</p>
+                    <hr style="border-color:#333; margin:1rem 0;">
+                    <button class="btn" style="background:#c0392b; border-color:#c0392b;" onclick="purgeSystemStorageCache()">Purge & Factory Reset Local Cache</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            if (sessionStorage.getItem('lora_admin_auth') === 'true') showAdminSuite();
+        });
+
+        function verifyAdminAccess() {
+            if (document.getElementById('auth-email').value === 'ahmedelkafas888@gmail.com') {
+                sessionStorage.setItem('lora_admin_auth', 'true');
+                showAdminSuite();
+                showToastNotification("✓ Authorization verified. Session initiated.");
+            } else {
+                document.getElementById('auth-error').style.display = 'block';
+            }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('lora_admin_auth');
+            window.location.reload();
+        }
+
+        function showAdminSuite() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'flex';
+            recalcStats();
+            renderCatalog();
+            renderCoupons();
+            renderOrders();
+        }
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
+            document.getElementById(`content-${tab}`).style.display = 'block';
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function processBinaryImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('prod-base64').value = e.target.result;
+                    document.getElementById('form-preview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function calcFormEgp(val) {
+            document.getElementById('egp-label').innerText = `Base: ${(parseFloat(val || 0) * EXCHANGE_RATE).toFixed(0)} EGP`;
+        }
+
+        function recalcStats() {
+            const p = getProducts();
+            const o = JSON.parse(localStorage.getItem('lora_orders')) || [];
+            const r = o.reduce((acc, current) => acc + parseFloat(current.totalEGP || 0), 0);
+            document.getElementById('st-p').innerText = p.length;
+            document.getElementById('st-o').innerText = o.length;
+            document.getElementById('st-r').innerText = `${r.toFixed(0)} EGP`;
+        }
+
+        function renderCatalog() {
+            const container = document.getElementById('admin-catalog-view');
+            container.innerHTML = '';
+            getProducts().forEach(p => {
+                const finalEgp = calculateFinalPrice(p.price, p.discount);
+                container.innerHTML += `
+                    <div class="admin-prod-card">
+                        <img src="${p.image}">
+                        <h4>${p.name}</h4>
+                        <p style="font-size:0.75rem; color:#aaa; margin:2px 0;">${p.bottleSize || '100ML'} | ${p.stockStatus || 'In Stock'}</p>
+                        <p style="color:var(--luxury-gold); font-weight:600;">${finalEgp.toFixed(0)} EGP</p>
+                        <button class="edit-btn" onclick="triggerEdit('${p.id}')">Modify</button>
+                        <button class="delete-btn" onclick="triggerDelete('${p.id}')">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const name = document.getElementById('prod-name').value;
+            const bottleSize = document.getElementById('prod-size').value;
+            const base64 = document.getElementById('prod-base64').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const discount = parseInt(document.getElementById('prod-discount').value || 0);
+            const category = document.getElementById('prod-category').value;
+            const stockStatus = document.getElementById('prod-stock').value;
+            const description = document.getElementById('prod-description').value;
+
+            if (!base64) { alert("Please upload or paste an asset imagery binary link."); return; }
+
+            let products = getProducts();
+            if (id) {
+                products = products.map(p => p.id === id ? {id, name, bottleSize, image: base64, price, discount, category, stockStatus, description} : p);
+                showToastNotification("✓ Product updated successfully");
+            } else {
+                products.push({ id: 'SKU-' + Date.now().toString().slice(-4), name, bottleSize, image: base64, price, discount, category, stockStatus, description });
+                showToastNotification("✓ Product asset formulated");
+            }
+
+            localStorage.setItem('lora_products', JSON.stringify(products));
+            clearAdminForm();
+            recalcStats();
+            renderCatalog();
+            switchAdminTab('products');
+        }
+
+        function triggerEdit(id) {
+            const p = getProducts().find(p => p.id === id);
+            if (p) {
+                document.getElementById('prod-id').value = p.id;
+                document.getElementById('prod-name').value = p.name;
+                document.getElementById('prod-size').value = p.bottleSize || '100ML';
+                document.getElementById('prod-base64').value = p.image;
+                document.getElementById('form-preview').src = p.image;
+                document.getElementById('prod-price').value = p.price;
+                document.getElementById('prod-discount').value = p.discount || 0;
+                document.getElementById('prod-category').value = p.category;
+                document.getElementById('prod-stock').value = p.stockStatus || 'In Stock';
+                document.getElementById('prod-description').value = p.description;
+                calcFormEgp(p.price);
+                document.getElementById('form-action-title').innerText = "Update Vaulted Specification";
+                switchAdminTab('add-product');
+            }
+        }
+
+        function triggerDelete(id) {
+            if (confirm("Confirm extraction of this asset from production database?")) {
+                let p = getProducts().filter(item => item.id !== id);
+                localStorage.setItem('lora_products', JSON.stringify(p));
+                showToastNotification("✓ Product removed successfully");
+                recalcStats();
+                renderCatalog();
+            }
+        }
+
+        function clearAdminForm() {
+            document.getElementById('product-form').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('prod-base64').value = '';
+            document.getElementById('form-preview').src = 'https://via.placeholder.com/150?text=No+Data';
+            document.getElementById('form-action-title').innerText = "Configure Product Entry";
+        }
+
+        function createCouponCode(e) {
+            e.preventDefault();
+            const code = document.getElementById('cp-code').value.trim().toUpperCase();
+            const percentage = document.getElementById('cp-pct').value;
+            const coupons = JSON.parse(localStorage.getItem('lora_coupons')) || [];
+            
+            coupons.push({ code, percentage, active: true });
+            localStorage.setItem('lora_coupons', JSON.stringify(coupons));
+            showToastNotification("✓ Coupon code generated");
+            document.getElementById('coupon-form').reset();
+            renderCoupons();
+        }
+
+        function renderCoupons() {
+            const rows = document.getElementById('coupon-table-rows');
+            rows.innerHTML = '';
+            const coupons = JSON.parse(localStorage.getItem('lora_coupons')) || [];
+            coupons.forEach((c, idx) => {
+                rows.innerHTML += `
+                    <tr>
+                        <td><strong>${c.code}</strong></td>
+                        <td>-${c.percentage}%</td>
+                        <td>${c.active ? '<span style="color:#2ecc71; font-weight:bold;">LIVE</span>':'<span style="color:#e74c3c; font-weight:bold;">MUTED</span>'}</td>
+                        <td>
+                            <button class="edit-btn" style="background:#444;" onclick="navigator.clipboard.writeText('${c.code}'); showToastNotification('✓ Code copied to clipboard');">Copy</button>
+                            <button class="delete-btn" onclick="toggleCoupon(${idx})">Toggle</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function toggleCoupon(idx) {
+            const coupons = JSON.parse(localStorage.getItem('lora_coupons')) || [];
+            coupons[idx].active = !coupons[idx].active;
+            localStorage.setItem('lora_coupons', JSON.stringify(coupons));
+            renderCoupons();
+        }
+
+        function renderOrders() {
+            const rows = document.getElementById('orders-table-rows');
+            rows.innerHTML = '';
+            const orders = JSON.parse(localStorage.getItem('lora_orders')) || [];
+            if (orders.length === 0) { rows.innerHTML = `<tr><td colspan="4">No tracking ledger frames found.</td></tr>`; return; }
+            orders.forEach(o => {
+                rows.innerHTML += `
+                    <tr>
+                        <td><strong>${o.id}</strong><br><small style="color:#777;">${o.date}</small></td>
+                        <td><strong>${o.customer.name}</strong><br>${o.customer.phone}<br>📍 ${o.customer.governorate}, Egypt</td>
+                        <td><small>${o.coupon || 'Direct Base'}</small></td>
+                        <td><strong style="color:var(--luxury-gold);">${o.totalEGP} EGP</strong></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function purgeSystemStorageCache() {
+            if (confirm("DANGER: This action fully wipes localStorage memory cache entities including customized products/coupons/orders. Continue?")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
