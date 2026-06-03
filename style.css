@@ -1,0 +1,143 @@
+/* --- COMPREHENSIVE BRAND DESIGN CONSTANTS --- */
+:root {
+    --luxury-white: #FCFCFC;
+    --luxury-black: #0E0E0E;
+    --luxury-gold: #D4AF37;
+    --luxury-gold-dark: #B8860B;
+    --luxury-gray-border: #EBEBEB;
+    --luxury-gray-text: #666666;
+    --font-serif: 'Cinzel', Georgia, serif;
+    --font-sans: 'Montserrat', sans-serif;
+    --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- RE-ARCHITECTED SYSTEM RESETS --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: var(--luxury-white); color: var(--luxury-black); font-family: var(--font-sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+.container { max-width: 1200px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+/* --- CORE HEADER & NAVIGATION --- */
+header { background-color: rgba(252, 252, 252, 0.98); border-bottom: 1px solid var(--luxury-gray-border); position: sticky; top: 0; z-index: 500; backdrop-filter: blur(8px); }
+.nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1.2rem 1.5rem; }
+.logo { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; }
+nav a { font-size: 0.8rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; margin: 0 1rem; transition: var(--transition-standard); position: relative; padding-bottom: 4px; }
+nav a::after { content: ''; position: absolute; bottom: 0; left: 50%; width: 0; height: 1px; background: var(--luxury-gold); transition: var(--transition-standard); transform: translateX(-50%); }
+nav a:hover::after, nav a.active::after { width: 100%; }
+nav a:hover, nav a.active { color: var(--luxury-gold); }
+.cart-icon-wrapper { font-size: 1.2rem; position: relative; }
+.cart-badge { background-color: var(--luxury-black); color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 6px; border-radius: 50%; position: absolute; top: -8px; right: -10px; }
+
+/* --- HERO & BANNER UI --- */
+.hero { height: 65vh; background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; display: flex; align-items: center; justify-content: center; text-align: center; color: white; }
+.hero-content span { font-size: 0.85rem; letter-spacing: 5px; display: block; margin-bottom: 0.8rem; }
+.hero-content h1 { font-family: var(--font-serif); font-size: 3.2rem; letter-spacing: 4px; margin-bottom: 1rem; font-weight: 400; }
+.hero-content p { font-size: 1rem; font-weight: 300; margin-bottom: 2rem; }
+
+/* --- BUTTON MATRIX PLATFORMS --- */
+.btn { display: inline-block; padding: 0.8rem 1.8rem; text-transform: uppercase; font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; background-color: var(--luxury-black); color: white; border: 1px solid var(--luxury-black); cursor: pointer; transition: var(--transition-standard); text-align: center; }
+.btn:hover { background-color: transparent; color: var(--luxury-black); }
+
+/* --- SPLIT LINE COMPONENT --- */
+.categories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding-top: 1rem; padding-bottom: 1rem; }
+.category-card { position: relative; height: 380px; overflow: hidden; cursor: pointer; }
+.category-card img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-standard); }
+.category-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+.category-overlay h3 { color: white; font-family: var(--font-serif); font-size: 1.6rem; letter-spacing: 3px; }
+.category-card:hover img { transform: scale(1.03); }
+
+/* --- SYMMETRICAL 2-COLUMN GRID (MANDATORY RESOLUTION) --- */
+.section-title { font-family: var(--font-serif); text-align: center; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 2rem; }
+.page-title { text-align: center; padding: 3rem 1.5rem; background-color: #fcfcfc; border-bottom: 1px solid #f4f4f4;}
+.page-title h1 { font-family: var(--font-serif); font-size: 2.2rem; letter-spacing: 3px; }
+.products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.product-card { background: white; border: 1px solid #f2f2f2; padding: 0.8rem; display: flex; flex-direction: column; position: relative; justify-content: space-between; }
+.product-card-img-wrapper { width: 100%; height: 260px; overflow: hidden; background-color: #fafafa; margin-bottom: 0.8rem; }
+.product-card img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-standard); }
+.product-card h3 { font-family: var(--font-serif); font-size: 0.95rem; font-weight: 500; margin-bottom: 0.2rem; color: #111; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.product-card .category-tag { font-size: 0.7rem; color: var(--luxury-gray-text); text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 1px; display: block; }
+.product-card .price { font-size: 0.95rem; font-weight: 600; color: var(--luxury-black); margin-bottom: 0.8rem; display: block; }
+.product-card-buttons-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.product-card .btn-cart { background: #fff; color: #000; border: 1px solid #000; padding: 0.5rem; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: var(--transition-standard); }
+.product-card .btn-cart:hover { background: #000; color: #fff; }
+.product-card .btn-buy { background: #000; color: #fff; border: 1px solid #000; padding: 0.5rem; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: var(--transition-standard); }
+.product-card .btn-buy:hover { background: #d4af37; border-color: #d4af37; }
+.discount-badge { position: absolute; top: 15px; left: 15px; background: #c0392b; color: white; font-size: 0.65rem; font-weight: 600; padding: 3px 8px; letter-spacing: 1px; z-index: 10; }
+.original-strike { text-decoration: line-through; color: #999; font-size: 0.85rem; margin-right: 6px; font-weight: 400; }
+
+/* --- DYNAMIC SHOWCASE VIEW --- */
+.product-detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; }
+.detail-image img { width: 100%; max-height: 480px; object-fit: cover; border: 1px solid var(--luxury-gray-border); }
+.detail-title { font-family: var(--font-serif); font-size: 2.2rem; margin-bottom: 0.8rem; font-weight: 400; }
+.detail-price { font-size: 1.5rem; font-weight: 500; margin-bottom: 1.5rem; }
+.detail-discount-tag { font-size: 0.8rem; background: #cc0000; color: #fff; padding: 2px 6px; margin-left: 10px; vertical-align: middle; }
+.detail-description { color: var(--luxury-gray-text); margin-bottom: 2rem; font-size: 0.95rem; }
+
+/* --- LUXE BAG STRUCTURES --- */
+.cart-layout { display: grid; grid-template-columns: 1.8fr 1fr; gap: 2.5rem; }
+.cart-item-card { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--luxury-gray-border); }
+.cart-item-card img { width: 70px; height: 95px; object-fit: cover; margin-right: 1.5rem; border: 1px solid var(--luxury-gray-border); }
+.cart-item-details { flex-grow: 1; }
+.cart-item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+.delete-item-btn { background: none; border: none; color: #cc0000; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+.cart-summary-box { background-color: #fafafa; padding: 1.5rem; border: 1px solid var(--luxury-gray-border); }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.9rem; }
+.total-row { font-size: 1.1rem; font-weight: 600; color: var(--luxury-gold-dark); }
+.checkout-btn { width: 100%; margin-top: 1rem; }
+
+/* --- CHECKOUT SPECIFICS --- */
+.checkout-container { max-width: 650px; }
+#checkout-form { background: white; padding: 2rem; border: 1px solid var(--luxury-gray-border); }
+.form-group { display: flex; flex-direction: column; margin-bottom: 1.2rem; flex: 1; }
+.form-group label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 0.4rem; }
+.form-group input, .form-group select, .form-group textarea { padding: 0.75rem; border: 1px solid var(--luxury-gray-border); font-family: var(--font-sans); font-size: 0.9rem; background: white; outline: none; }
+.form-row { display: flex; gap: 1rem; }
+.order-submit-btn { width: 100%; background-color: #2e7d32; border-color: #2e7d32; }
+.order-submit-btn:hover { background: transparent; color: #2e7d32; }
+
+/* --- ADVANCED BACKOFFICE SINGLE PAGE ENGINE --- */
+.admin-body { background-color: #121212; color: #e0e0e0; font-family: var(--font-sans); }
+.auth-modal { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.auth-box { background: #1a1a1a; padding: 2.5rem; border: 1px solid #2a2a2a; text-align: center; max-width: 400px; width: 100%; }
+.auth-box h2 { font-family: var(--font-serif); color: var(--luxury-gold); margin-bottom: 0.5rem; }
+.auth-box input { width: 100%; padding: 0.8rem; margin: 1rem 0; background: #0a0a0a; border: 1px solid #333; color: white; text-align: center; }
+.error-msg { color: #e74c3c; font-size: 0.8rem; margin-top: 0.5rem; display: none; }
+
+.admin-layout { display: flex; min-height: 100vh; }
+.admin-sidebar { width: 260px; background-color: #0a0a0a; border-right: 1px solid #222; padding: 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh; top: 0; left: 0; }
+.sidebar-brand { font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; color: var(--luxury-gold); margin-bottom: 2rem; text-align: center; }
+.sidebar-menu { list-style: none; flex-grow: 1; }
+.sidebar-menu li { padding: 0.8rem; cursor: pointer; font-size: 0.85rem; color: #aaaaaa; transition: var(--transition-standard); margin-bottom: 0.2rem; }
+.sidebar-menu li:hover, .sidebar-menu li.active { color: white; background: #1a1a1a; border-left: 3px solid var(--luxury-gold); }
+.back-store-link { color: var(--luxury-gold); font-size: 0.8rem; margin-bottom: 1rem; display: block; text-align: center; padding: 0.5rem; border: 1px dashed var(--luxury-gold); }
+.logout-btn { background: #c0392b; color: white; border: none; padding: 0.6rem; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
+.admin-content { flex-grow: 1; padding: 2rem 2.5rem; background: #121212; margin-left: 260px; min-height: 100vh; }
+.admin-section h2 { font-family: var(--font-serif); margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.4rem; color: #fff; }
+.metrics-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
+.metric-card { background: #1a1a1a; padding: 1.5rem; flex: 1; border: 1px solid #2a2a2a; border-radius: 4px; }
+.metric-card h3 { font-size: 2rem; color: var(--luxury-gold); margin-bottom: 0.4rem; }
+.admin-products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; }
+.admin-prod-card { background: #1a1a1a; border: 1px solid #2a2a2a; padding: 0.8rem; border-radius: 4px; text-align: center; }
+.admin-prod-card img { width: 100%; height: 140px; object-fit: cover; margin-bottom: 0.6rem; }
+.admin-prod-card h4 { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.4rem; }
+.admin-prod-card button { padding: 0.3rem 0.6rem; font-size: 0.7rem; cursor: pointer; border: none; margin: 2px; }
+.edit-btn { background: var(--luxury-gold); color: white; }
+.delete-btn { background: #c0392b; color: white; }
+.admin-form-img-preview { width: 90px; height: 90px; object-fit: cover; border: 1px dashed var(--luxury-gold); margin-top: 0.4rem; }
+.orders-table { width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid #2a2a2a; font-size: 0.85rem; }
+.orders-table th, .orders-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #2a2a2a; }
+.orders-table th { background-color: #0a0a0a; color: var(--luxury-gold); }
+
+/* --- COMPACT FOOTER --- */
+footer { border-top: 1px solid var(--luxury-gray-border); text-align: center; padding: 2rem 1.5rem; font-size: 0.75rem; color: var(--luxury-gray-text); background: white; margin-top: 3rem; }
+
+/* --- RIGID RESPONSIVE BREAKPOINT INTERFACES --- */
+@media (max-width: 768px) {
+    .nav-container { flex-direction: column; gap: 0.8rem; }
+    .hero-content h1 { font-size: 2.2rem; }
+    .categories-grid, .product-detail-layout, .cart-layout, .form-row { grid-template-columns: 1fr; }
+    .admin-sidebar { width: 100%; height: auto; position: relative; }
+    .admin-content { margin-left: 0; padding: 1rem; }
+    .metrics-row { flex-direction: column; }
+}
