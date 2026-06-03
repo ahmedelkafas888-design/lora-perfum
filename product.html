@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragrance Profile | LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <header>
+        <div class="nav-container">
+            <div class="lang-switch-wrapper">
+                <button onclick="toggleLanguageSystem()" class="lang-toggle-btn" id="lang-btn">العربية</button>
+            </div>
+            <a href="index.html" class="logo">LORA</a>
+            <div class="nav-icons">
+                <a href="admin.html" class="nav-admin-icon">⚙️</a>
+                <a href="cart.html" class="cart-icon-wrapper">
+                    🛒 <span id="cart-badge" class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+        <nav class="sub-nav-menu">
+            <a href="index.html" data-i18n="nav_home">Home</a>
+            <a href="products.html?category=all" data-i18n="nav_collection">Collection</a>
+        </nav>
+    </header>
+
+    <section class="container single-product-container">
+        <div id="product-details-wrapper" class="product-detail-layout"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 LORA. <span data-i18n="footer_rights">All Rights Reserved.</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            applyLanguageDOM();
+            updateCartBadge();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const products = getProducts();
+            const product = products.find(p => p.id === productId);
+            const wrapper = document.getElementById('product-details-wrapper');
+
+            if (!product) {
+                wrapper.innerHTML = `<h2 style="grid-column:1/-1; text-align:center;">Specification missing from registry.</h2>`;
+                return;
+            }
+
+            const finalEgp = calculateFinalPrice(product.price, product.discount);
+            const originalEgp = (parseFloat(product.price) * EXCHANGE_RATE);
+            const parsedDiscount = parseInt(product.discount || 0);
+            const stockStatus = product.stockStatus || 'In Stock';
+            const sizeOption = product.bottleSize || '100ML';
+            const lang = getCurrentLang();
+
+            let stockClass = 'badge-stock-in';
+            if (stockStatus === 'Low Stock') stockClass = 'badge-stock-low';
+            if (stockStatus === 'Sold Out') stockClass = 'badge-stock-out';
+
+            const stockLabelTranslated = TRANSLATION_MATRIX[lang][stockStatus.toLowerCase().replace(' ', '_')] || stockStatus;
+            const offText = lang === 'ar' ? "خصم" : "OFF";
+
+            let priceDisplayHtml = parsedDiscount > 0 
+                ? `<div class="detail-price">
+                     <span class="original-strike">${originalEgp.toFixed(0)} EGP</span>
+                     <span>${finalEgp.toFixed(0)} EGP</span>
+                     <span class="detail-discount-tag">-${parsedDiscount}% ${offText}</span>
+                   </div>`
+                : `<div class="detail-price">${finalEgp.toFixed(0)} EGP</div>`;
+
+            const isSoldOut = stockStatus === 'Sold Out';
+            const actionButtonsDisabledState = isSoldOut ? 'disabled style="opacity:0.4; pointer-events:none;"' : '';
+
+            wrapper.innerHTML = `
+                <div class="detail-image">
+                    <img src="${product.image}" alt="${product.name}">
+                </div>
+                <div class="detail-info">
+                    <span class="detail-category">MAISON LORA ${product.category.toUpperCase()} LINE</span>
+                    <h1 class="detail-title">${product.name}</h1>
+                    
+                    <div style="margin-bottom:1.5rem; display:flex; gap:10px; align-items:center;">
+                        <span class="product-stock-badge ${stockClass}">${stockLabelTranslated}</span>
+                        <span class="product-size-badge">${sizeOption}</span>
+                    </div>
+
+                    ${priceDisplayHtml}
+                    <p class="detail-description">${product.description}</p>
+                    
+                    <div class="purchase-actions">
+                        <div class="qty-selector">
+                            <button onclick="adjustDetailQty(-1)" ${actionButtonsDisabledState}>-</button>
+                            <input type="number" id="detail-qty" value="1" min="1" readonly>
+                            <button onclick="adjustDetailQty(1)" ${actionButtonsDisabledState}>+</button>
+                        </div>
+                        <button class="btn" style="background:#fff; color:#000; border-color:#000;" onclick="handleDetailAction('${product.id}', false)" ${actionButtonsDisabledState} data-i18n="btn_add_cart">Add To Cart</button>
+                        <button class="btn" onclick="handleDetailAction('${product.id}', true)" ${actionButtonsDisabledState} data-i18n="btn_buy_now">Buy Now</button>
+                    </div>
+                </div>
+            `;
+            applyLanguageDOM();
+        });
+
+        function adjustDetailQty(amount) {
+            const qtyInput = document.getElementById('detail-qty');
+            let val = parseInt(qtyInput.value) + amount;
+            if (val < 1) val = 1;
+            qtyInput.value = val;
+        }
+
+        function handleDetailAction(id, directCheckout) {
+            const qty = parseInt(document.getElementById('detail-qty').value);
+            addToCart(id, qty);
+            const isAr = getCurrentLang() === 'ar';
+            showToastNotification(isAr ? "✓ تم إضافة المنتج لعربة التسوق" : "✓ Product added to cart");
+            if (directCheckout) {
+                setTimeout(() => { window.location.href = 'checkout.html'; }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
