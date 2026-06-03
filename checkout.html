@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics Gateway | LORA PARFUMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">LORA PARFUMS</a>
+        </div>
+    </header>
+
+    <section class="container checkout-container">
+        <h1 class="section-title">Delivery Matrix</h1>
+        
+        <form id="checkout-form" onsubmit="processOrder(event)">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" required placeholder="Full Identity Reference">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Contact</label>
+                <input type="tel" id="phone" required placeholder="e.g., +201208711729">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="country">Country Zone</label>
+                    <input type="text" id="country" value="Egypt" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="governorate">Governorate</label>
+                    <select id="governorate" required>
+                        <option value="" disabled selected>Select Governorate</option>
+                        <option value="Cairo">Cairo</option>
+                        <option value="Giza">Giza</option>
+                        <option value="Alexandria">Alexandria</option>
+                        <option value="Dakahlia">Dakahlia</option>
+                        <option value="Sharqia">Sharqia</option>
+                        <option value="Gharbia">Gharbia</option>
+                        <option value="Monufia">Monufia</option>
+                        <option value="Kafr El Sheikh">Kafr El Sheikh</option>
+                        <option value="Beheira">Beheira</option>
+                        <option value="Damietta">Damietta</option>
+                        <option value="Port Said">Port Said</option>
+                        <option value="Ismailia">Ismailia</option>
+                        <option value="Suez">Suez</option>
+                        <option value="North Sinai">North Sinai</option>
+                        <option value="South Sinai">South Sinai</option>
+                        <option value="Faiyum">Faiyum</option>
+                        <option value="Beni Suef">Beni Suef</option>
+                        <option value="Minya">Minya</option>
+                        <option value="Assiut">Assiut</option>
+                        <option value="Sohag">Sohag</option>
+                        <option value="Qena">Qena</option>
+                        <option value="Luxor">Luxor</option>
+                        <option value="Aswan">Aswan</option>
+                        <option value="Red Sea">Red Sea</option>
+                        <option value="New Valley">New Valley</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City / District</label>
+                    <input type="text" id="city" required placeholder="District Specification">
+                </div>
+                <div class="form-group">
+                    <label for="address">Residential Address Line</label>
+                    <input type="text" id="address" required placeholder="Street, Villa, Suite Context">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn order-submit-btn">Authorize Order & Route via WhatsApp</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 LORA PARFUMS. All Rights Reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            if(getCart().length === 0) window.location.href = 'cart.html';
+        });
+
+        function processOrder(e) {
+            e.preventDefault();
+            
+            const customer = {
+                name: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                country: document.getElementById('country').value,
+                governorate: document.getElementById('governorate').value,
+                city: document.getElementById('city').value,
+                address: document.getElementById('address').value
+            };
+
+            const cart = getCart();
+            const products = getProducts();
+            let subtotalEGP = 0;
+            let manifests = "";
+
+            cart.forEach((item, index) => {
+                const prod = products.find(p => p.id === item.id);
+                if(prod) {
+                    const finalLineEgp = calculateFinalPrice(prod.price, prod.discount);
+                    const cumulativeEgp = finalLineEgp * item.quantity;
+                    subtotalEGP += cumulativeEgp;
+                    manifests += `${index + 1}. ${prod.name} [x${item.quantity}] @ ${finalLineEgp.toFixed(0)} EGP\n`;
+                }
+            });
+
+            const coupon = JSON.parse(localStorage.getItem('lora_applied_coupon'));
+            let totalPayable = subtotalEGP;
+            let couponLabel = "None Provided";
+            
+            if(coupon) {
+                totalPayable = subtotalEGP - (subtotalEGP * (parseInt(coupon.percentage) / 100));
+                couponLabel = `${coupon.code} (-${coupon.percentage}%)`;
+            }
+
+            const activeOrders = JSON.parse(localStorage.getItem('lora_orders')) || [];
+            activeOrders.push({
+                id: 'LORA-ORD-' + Date.now().toString().slice(-6),
+                customer: customer,
+                items: cart,
+                coupon: couponLabel,
+                totalEGP: totalPayable.toFixed(0),
+                date: new Date().toLocaleDateString('en-US')
+            });
+            localStorage.setItem('lora_orders', JSON.stringify(activeOrders));
+
+            const payloadText = `✨ *OFFICIAL PURCHASE ORDER - LORA PARFUMS* ✨\n\n` +
+                                `👤 *CLIENT PROFILE:*\n` +
+                                `▪️ *Name:* ${customer.name}\n` +
+                                `▪️ *Phone Line:* ${customer.phone}\n` +
+                                `▪️ *Logistics:* ${customer.address}, ${customer.city}, ${customer.governorate}, ${customer.country}\n\n` +
+                                `📦 *MANIFEST CONTENT:*\n` +
+                                `${manifests}\n` +
+                                `🎫 *COUPON AUDIT:* ${couponLabel}\n` +
+                                `💰 *NET CHARGE TO PAY:* ${totalPayable.toFixed(0)} EGP\n\n` +
+                                `Thank you for choosing LORA PARFUMS. Tracking initiated.`;
+
+            const encoded = encodeURIComponent(payloadText);
+            localStorage.removeItem('lora_cart');
+            localStorage.removeItem('lora_applied_coupon');
+            
+            window.open(`https://wa.me/201208711729?text=${encoded}`, '_blank');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
