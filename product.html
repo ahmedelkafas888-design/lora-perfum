@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fragrance Profile | LORA PARFUMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="global-navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">LORA PARFUMS</a>
+            <nav class="nav-links-desktop">
+                <a href="index.html" data-i18n="nav_home">Home</a>
+                <a href="products.html?category=all" data-i18n="nav_collection">Collection</a>
+            </nav>
+            <div class="nav-action-utilities">
+                <select id="lang-selector-node" class="lang-minimal-dropdown" onchange="executeLanguageToggle(this.value)">
+                    <option value="en">EN</option>
+                    <option value="ar">AR</option>
+                </select>
+                <a href="cart.html" class="cart-anchor-icon">
+                    🛒<span id="cart-counter-badge" class="cart-counter-pill">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="viewport-wrapper container">
+        <div id="dynamic-detail-mount-point" class="product-profile-layout">
+            </div>
+    </main>
+
+    <footer class="global-footer-node">
+        <p>&copy; 2026 LORA PARFUMS. <span data-i18n="footer_rights">All Rights Reserved.</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        let contextualProductObject = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initializeDatabaseEngine();
+            syncDocumentLocalization();
+            updateNavigationCartTotals();
+
+            const routeId = new URLSearchParams(window.location.search).get("id");
+            contextualProductObject = fetchProductsFromStorage().find(p => p.id === routeId);
+
+            const container = document.getElementById("dynamic-detail-mount-point");
+            if(!contextualProductObject) {
+                container.innerHTML = `<h2 class="empty-state-text" data-i18n="product_not_found">Product configuration parameters not found.</h2>`;
+                return;
+            }
+
+            document.title = `${contextualProductObject.name} | LORA PARFUMS`;
+            buildDetailedProfileLayout(container);
+            syncDocumentLocalization();
+        });
+
+        function buildDetailedProfileLayout(mountPoint) {
+            const p = contextualProductObject;
+            
+            // Compute Initial active size configuration parameter array
+            const primeSize = p.sizes && p.sizes.length > 0 ? p.sizes[0] : { volume: "100ml", priceEgp: 0 };
+            const baseDiscount = parseInt(p.discount || 0);
+
+            let stockBadgeTemplate = '';
+            let operationsDisabledAttribute = '';
+
+            if(p.stockStatus === "Sold Out") {
+                stockBadgeTemplate = `<span class="stock-indicator-badge pill-soldout" data-i18n="badge_sold_out">SOLD OUT</span>`;
+                operationsDisabledAttribute = 'disabled';
+            } else if(p.stockStatus === "Low Stock") {
+                stockBadgeTemplate = `<span class="stock-indicator-badge pill-lowstock" data-i18n="badge_low_stock">Only Few Left</span>`;
+            }
+
+            let sizeSelectorsTemplate = '';
+            if(p.sizes && p.sizes.length > 0) {
+                p.sizes.forEach((sz, index) => {
+                    sizeSelectorsTemplate += `
+                        <label class="size-token-pill">
+                            <input type="radio" name="profile-size-matrix" value="${index}" ${index === 0 ? 'checked' : ''} onchange="refreshProfilePriceDisplay(${baseDiscount})">
+                            <span>${sz.volume}</span>
+                        </label>
+                    `;
+                });
+            }
+
+            mountPoint.innerHTML = `
+                <div class="profile-image-frame">
+                    <img src="${p.image}" alt="${p.name}">
+                </div>
+                <div class="profile-content-details">
+                    <div class="profile-meta-header">
+                        <span class="m-category-tag">${p.category === 'Women' ? 'Maison Femme' : 'Maison Homme'}</span>
+                        ${stockBadgeTemplate}
+                    </div>
+                    <h1 class="profile-title">${p.name}</h1>
+                    
+                    <div class="profile-pricing-wrapper" id="profile-price-mount-node">
+                        </div>
+
+                    <p class="profile-description-narrative">${p.description}</p>
+
+                    <div class="profile-spec-selectors">
+                        <h4 data-i18n="select_size">Select Formulation Size:</h4>
+                        <div class="size-options-horizontal-row">
+                            ${sizeSelectorsTemplate}
+                        </div>
+                    </div>
+
+                    <div class="profile-actions-lockup">
+                        <button class="action-btn-secondary" ${operationsDisabledAttribute} onclick="executeProfileAddToCart()" data-i18n="add_to_cart">Add To Cart</button>
+                        <button class="action-btn-primary" ${operationsDisabledAttribute} onclick="executeProfileBuyNow()" data-i18n="buy_now">Buy Now</button>
+                    </div>
+                </div>
+            `;
+            
+            refreshProfilePriceDisplay(baseDiscount);
+        }
+
+        function refreshProfilePriceDisplay(discountPercentage) {
+            const checkedRadio = document.querySelector('input[name="profile-size-matrix"]:checked');
+            if(!checkedRadio) return;
+            
+            const sizeIdx = parseInt(checkedRadio.value);
+            const targetSizeObject = contextualProductObject.sizes[sizeIdx];
+            const baseEgpPrice = parseFloat(targetSizeObject.priceEgp);
+            const mountNode = document.getElementById("profile-price-mount-node");
+
+            if(discountPercentage > 0) {
+                const slashedNetPrice = baseEgpPrice - (baseEgpPrice * (discountPercentage / 100));
+                mountNode.innerHTML = `
+                    <span class="slashed-base-price">${baseEgpPrice.toFixed(0)} EGP</span>
+                    <span class="luxe-active-price">${slashedNetPrice.toFixed(0)} EGP</span>
+                    <span class="inline-discount-percentage-ribbon">${discountPercentage}% OFF</span>
+                `;
+            } else {
+                mountNode.innerHTML = `
+                    <span class="luxe-active-price">${baseEgpPrice.toFixed(0)} EGP</span>
+                `;
+            }
+        }
+
+        function executeProfileAddToCart() {
+            const checkedRadio = document.querySelector('input[name="profile-size-matrix"]:checked');
+            if(!checkedRadio) return;
+            const sizeIdx = parseInt(checkedRadio.value);
+            const selectedSizeObj = contextualProductObject.sizes[sizeIdx];
+
+            injectItemToGlobalCart(contextualProductObject.id, selectedSizeObj.volume);
+            alert(getSystemLocaleMap()[getCurrentSystemLanguage()]["added_alert"]);
+        }
+
+        function executeProfileBuyNow() {
+            const checkedRadio = document.querySelector('input[name="profile-size-matrix"]:checked');
+            if(!checkedRadio) return;
+            const sizeIdx = parseInt(checkedRadio.value);
+            const selectedSizeObj = contextualProductObject.sizes[sizeIdx];
+
+            injectItemToGlobalCart(contextualProductObject.id, selectedSizeObj.volume);
+            window.location.href = "checkout.html";
+        }
+    </script>
+</body>
+</html>
