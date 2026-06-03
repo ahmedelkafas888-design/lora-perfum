@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Logistics Gateway | LORA PARFUMS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="global-navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">LORA PARFUMS</a>
+            <div class="nav-action-utilities">
+                <select id="lang-selector-node" class="lang-minimal-dropdown" onchange="executeLanguageToggle(this.value)">
+                    <option value="en">EN</option>
+                    <option value="ar">AR</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="viewport-wrapper container luxury-checkout-max-width">
+        <h1 class="section-heading-title" data-i18n="checkout_form_title">Delivery Matrix</h1>
+        
+        <form id="checkout-logistics-form" class="luxe-checkout-form-card" onsubmit="executeOrderFinalizationWorkflow(event)">
+            <div class="form-input-element-group">
+                <label data-i18n="lbl_name">Full Name</label>
+                <input type="text" id="chk-full-name" required placeholder="John Doe">
+            </div>
+
+            <div class="form-input-element-group">
+                <label data-i18n="lbl_phone">Phone Contact</label>
+                <input type="tel" id="chk-phone" required placeholder="+201XXXXXXXXX">
+            </div>
+
+            <div class="form-input-element-group">
+                <label data-i18n="lbl_gov">Governorate</label>
+                <select id="chk-governorate" required>
+                    <option value="" disabled selected data-i18n="select_gov_placeholder">Select Governorate</option>
+                    <option value="Cairo">Cairo</option>
+                    <option value="Giza">Giza</option>
+                    <option value="Alexandria">Alexandria</option>
+                    <option value="Dakahlia">Dakahlia</option>
+                    <option value="Red Sea">Red Sea</option>
+                    <option value="Beheira">Beheira</option>
+                    <option value="Fayoum">Fayoum</option>
+                    <option value="Gharbia">Gharbia</option>
+                    <option value="Ismailia">Ismailia</option>
+                    <option value="Menoufia">Menoufia</option>
+                    <option value="Minya">Minya</option>
+                    <option value="Qalyubia">Qalyubia</option>
+                    <option value="New Valley">New Valley</option>
+                    <option value="Suez">Suez</option>
+                    <option value="Aswan">Aswan</option>
+                    <option value="Assiut">Assiut</option>
+                    <option value="Beni Suef">Beni Suef</option>
+                    <option value="Port Said">Port Said</option>
+                    <option value="Damietta">Damietta</option>
+                    <option value="Sharkia">Sharkia</option>
+                    <option value="South Sinai">South Sinai</option>
+                    <option value="Kafr El Sheikh">Kafr El Sheikh</option>
+                    <option value="Matrouh">Matrouh</option>
+                    <option value="Luxor">Luxor</option>
+                    <option value="Qena">Qena</option>
+                    <option value="North Sinai">North Sinai</option>
+                    <option value="Sohag">Sohag</option>
+                </select>
+            </div>
+
+            <div class="form-input-element-group">
+                <label data-i18n="lbl_city">City / District</label>
+                <input type="text" id="chk-city" required placeholder="New Cairo">
+            </div>
+
+            <div class="form-input-element-group">
+                <label data-i18n="lbl_address">Residential Address Line</label>
+                <textarea id="chk-address" rows="3" required placeholder="Building, Street, Apartment"></textarea>
+            </div>
+
+            <button type="submit" class="whatsapp-grand-checkout-btn">
+                <span data-i18n="authorize_btn">Authorize Order & Route via WhatsApp</span>
+            </button>
+        </form>
+    </main>
+
+    <footer class="global-footer-node">
+        <p>&copy; 2026 LORA PARFUMS. <span data-i18n="footer_rights">All Rights Reserved.</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            initializeDatabaseEngine();
+            syncDocumentLocalization();
+            if(fetchCartFromStorage().length === 0) {
+                window.location.href = "cart.html";
+            }
+        });
+
+        function executeOrderFinalizationWorkflow(e) {
+            e.preventDefault();
+
+            const customerContext = {
+                name: document.getElementById("chk-full-name").value.trim(),
+                phone: document.getElementById("chk-phone").value.trim(),
+                governorate: document.getElementById("chk-governorate").value,
+                city: document.getElementById("chk-city").value.trim(),
+                address: document.getElementById("chk-address").value.trim()
+            };
+
+            const cartCollection = fetchCartFromStorage();
+            const productRegistry = fetchProductsFromStorage();
+
+            let manifestOrderStringBuilder = "";
+            let netAccumulatedSubtotal = 0;
+
+            cartCollection.forEach((item, index) => {
+                const productObj = productRegistry.find(p => p.id === item.id);
+                if(productObj) {
+                    const matchedSizeObj = productObj.sizes.find(s => s.volume === item.size) || productObj.sizes[0];
+                    const itemUnitBasePrice = parseFloat(matchedSizeObj.priceEgp);
+                    const itemUnitNetPrice = itemUnitBasePrice - (itemUnitBasePrice * (parseInt(productObj.discount || 0) / 100));
+                    const multiQuantitySum = itemUnitNetPrice * item.quantity;
+                    
+                    netAccumulatedSubtotal += multiQuantitySum;
+                    manifestOrderStringBuilder += `${index + 1}. ${productObj.name} (${item.size}) [x${item.quantity}] - ${multiQuantitySum.toFixed(0)} EGP\n`;
+                }
+            });
+
+            const attachedCouponObj = JSON.parse(localStorage.getItem("lora_active_applied_coupon"));
+            let totalOrderFinalSum = netAccumulatedSubtotal;
+            let couponLoggedString = "None Provided";
+
+            if(attachedCouponObj) {
+                const markdownDeduction = netAccumulatedSubtotal * (parseInt(attachedCouponObj.percentage) / 100);
+                totalOrderFinalSum = netAccumulatedSubtotal - markdownDeduction;
+                couponLoggedString = `${attachedCouponObj.code} (-${attachedCouponObj.percentage}%)`;
+            }
+
+            // Save historical order data inside persistent store
+            const orderHistoryRegistry = JSON.parse(localStorage.getItem("lora_orders")) || [];
+            const freshOrderObject = {
+                id: "ORD-" + Date.now().toString().slice(-6),
+                customer: customerContext,
+                productsSummary: manifestOrderStringBuilder,
+                couponCodeUsed: couponLoggedString,
+                finalTotalCharged: `${totalOrderFinalSum.toFixed(0)} EGP`,
+                dateString: new Date().toLocaleDateString("en-US")
+            };
+            orderHistoryRegistry.push(freshOrderObject);
+            localStorage.setItem("lora_orders", JSON.stringify(orderHistoryRegistry));
+
+            // WhatsApp Message Formatting Builder
+            const finalStringPayload = 
+                `✨ *OFFICIAL PURCHASE ORDER - LORA PARFUMS* ✨\n\n` +
+                `👤 *CLIENT PROFILE:*\n` +
+                `▪️ *Name:* ${customerContext.name}\n` +
+                `▪️ *Phone Line:* ${customerContext.phone}\n` +
+                `▪️ *Destination:* ${customerContext.governorate}, ${customerContext.city}\n` +
+                `▪️ *Logistics Address:* ${customerContext.address}\n\n` +
+                `📦 *MANIFEST CONTENT:*\n${manifestOrderStringBuilder}\n` +
+                `🎫 *COUPON AUDIT:* ${couponLoggedString}\n` +
+                `💰 *NET CHARGE TO PAY:* ${totalOrderFinalSum.toFixed(0)} EGP\n\n` +
+                `Thank you for choosing LORA PARFUMS.`;
+
+            const cleanUrlEncodedText = encodeURIComponent(finalStringPayload);
+            
+            // Clear checkout context states safely
+            localStorage.removeItem("lora_cart");
+            localStorage.removeItem("lora_active_applied_coupon");
+
+            window.open(`https://wa.me/201208711729?text=${cleanUrlEncodedText}`, "_blank");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
