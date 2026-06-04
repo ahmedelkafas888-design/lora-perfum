@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rare Essences Manifest | Maison De Parfum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="store-container nav-wrapper">
+            <button id="langSwitcherBtn" class="text-xs tracking-widest uppercase font-bold text-amber-500">العربية</button>
+            <a href="index.html" class="text-2xl tracking-[0.2em] font-light luxury-heading gold-gradient-text">MAISON DE PARFUM</a>
+            <nav class="hidden md:flex gap-8">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="navHome">Home</a></li>
+                    <li><a href="products.html" data-i18n="navProducts">Fragrances</a></li>
+                    <li><a href="wishlist.html" data-i18n="navWishlist">Wishlist</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">Atelier Panel</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="wishlist.html" class="icon-btn"><span>♥</span><span id="wishlistCountBadge" class="badge">0</span></a>
+                <a href="cart.html" class="icon-btn"><span>🛒</span><span id="cartCountBadge" class="badge">0</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[130px] store-container pb-24">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 border-b border-zinc-800 pb-8 mb-12">
+            <div class="flex flex-wrap gap-4 text-xs tracking-widest uppercase">
+                <button type="button" onclick="window.CatalogModule.filterCat('all')" class="px-4 py-2 bg-zinc-900 border border-amber-500/20 text-white hover:border-amber-500 transition">All</button>
+                <button type="button" onclick="window.CatalogModule.filterCat('men')" class="px-4 py-2 bg-zinc-900 border border-amber-500/20 text-stone-400 hover:border-amber-500 transition">Pour Homme</button>
+                <button type="button" onclick="window.CatalogModule.filterCat('women')" class="px-4 py-2 bg-zinc-900 border border-amber-500/20 text-stone-400 hover:border-amber-500 transition">Pour Femme</button>
+                <button type="button" onclick="window.CatalogModule.filterCat('unisex')" class="px-4 py-2 bg-zinc-900 border border-amber-500/20 text-stone-400 hover:border-amber-500 transition">Unisex</button>
+            </div>
+            <input type="text" id="catalogSearchQueryField" oninput="window.CatalogModule.search(this.value)" class="luxury-input md:w-80" data-i18n-placeholder="searchPlaceholder" placeholder="Search rare essences...">
+        </div>
+
+        <div id="absoluteCatalogGlobalGridWrapper" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+    </main>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { dbEngine } from "./firebase.js";
+        import { StoreApp } from "./script.js";
+        import { CartEngine } from "./cart.js";
+
+        const CatalogModule = {
+            rawItems: [],
+            activeCategory: "all",
+            searchStr: "",
+
+            async render() {
+                const target = document.getElementById("absoluteCatalogGlobalGridWrapper");
+                if(!target) return;
+                
+                try {
+                    this.rawItems = await dbEngine.getCollection("products");
+                    const filtered = this.rawItems.filter(p => {
+                        const matchesCat = this.activeCategory === "all" || p.category === this.activeCategory;
+                        const matchName = (p.nameEn + p.nameAr).toLowerCase().includes(this.searchStr.toLowerCase());
+                        return matchesCat && matchName;
+                    });
+
+                    if(filtered.length === 0) {
+                        target.innerHTML = `<p class="col-span-full text-center text-zinc-500 py-12">No compositions match the structural filtering criterion.</p>`;
+                        return;
+                    }
+
+                    target.innerHTML = filtered.map(p => `
+                        <div class="luxury-card p-6 flex flex-col justify-between">
+                            <div>
+                                <div class="relative overflow-hidden mb-6">
+                                    <a href="product.html?id=${p.id}">
+                                        <img src="${p.image}" class="w-full h-84 object-cover transition duration-700 hover:scale-105">
+                                    </a>
+                                    <button type="button" onclick="window.CatalogModule.toggleWish('${p.id}')" class="absolute top-4 right-4 bg-black/80 w-8 h-8 rounded-full text-amber-500 flex items-center justify-center border border-amber-500/20">♥</button>
+                                </div>
+                                <h3 class="text-xl font-light mb-1 text-white">${StoreApp.state.lang === 'en' ? p.nameEn : p.nameAr}</h3>
+                                <p class="text-xs text-zinc-500 mb-4 uppercase tracking-widest">${p.category}</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-4 border-t border-zinc-800">
+                                <span class="text-xl font-light text-amber-400">$${p.price}</span>
+                                <button type="button" onclick="CartEngine.addToCart('${p.id}')" class="text-xs px-4 py-2 bg-amber-500 text-black uppercase tracking-wider font-bold hover:bg-white transition">${StoreApp.dictionary[StoreApp.state.lang].addToCart}</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch(e) {
+                    target.innerHTML = `<p class="col-span-full text-center text-red-400 py-12">Unable to process product queries from firestore infrastructure layer.</p>`;
+                }
+            },
+            filterCat(cat) { this.activeCategory = cat; this.render(); },
+            search(val) { this.searchStr = val; this.render(); },
+            toggleWish(id) {
+                let list = StoreApp.state.wishlist;
+                if(list.includes(id)) {
+                    list = list.filter(i => i !== id);
+                    StoreApp.showNotification("removedFromWish");
+                } else {
+                    list.push(id);
+                    StoreApp.showNotification("addedToWishlist");
+                }
+                StoreApp.state.wishlist = list;
+                localStorage.setItem("lux_perfume_wishlist", JSON.stringify(list));
+                StoreApp.updateBadgeCounts();
+            }
+        };
+
+        window.CatalogModule = CatalogModule;
+        document.addEventListener("DOMContentLoaded", () => CatalogModule.render());
+    </script>
+</body>
+</html>
