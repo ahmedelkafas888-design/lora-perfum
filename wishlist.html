@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Desires Manifest | LORA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <button id="langSwitcherBtn" class="text-xs tracking-widest uppercase font-bold text-amber-500">العربية</button>
+            <a href="index.html" class="brand-logo">LORA</a>
+            <nav class="hidden md:flex">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="navHome">Home</a></li>
+                    <li><a href="products.html" data-i18n="navProducts">Fragrances</a></li>
+                    <li><a href="wishlist.html" data-i18n="navWishlist">Wishlist</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">Atelier Vault</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <a href="wishlist.html" class="icon-btn text-xl relative">♥<span id="wishlistCountBadge" class="badge">0</span></a>
+                <a href="cart.html" class="icon-btn text-xl relative">🛒<span id="cartCountBadge" class="badge">0</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[140px] max-w-7xl mx-auto px-8 pb-24">
+        <h1 class="text-2xl tracking-widest uppercase text-center mb-16 text-zinc-900" data-i18n="navWishlist">Wishlist</h1>
+        <div id="wishlistWorkspaceGridTargetDOMNode" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+    </main>
+
+    <div id="globalLoraSystemNotificationToast" class="luxury-toast-message"></div>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { LoraProductsEngine } from "./products.js";
+        import { LoraApp } from "./script.js";
+
+        async function populateWishlistView() {
+            const targetGrid = document.getElementById("wishlistWorkspaceGridTargetDOMNode");
+            if (!targetGrid) return;
+
+            const currentWishIds = LoraApp.state.wishlist;
+            if (currentWishIds.length === 0) {
+                targetGrid.innerHTML = `<p class="col-span-full text-center text-zinc-400 font-sans text-xs py-12 uppercase tracking-wider">Your curated desires manifest is currently unpopulated.</p>`;
+                return;
+            }
+
+            let htmlStringAccumulator = "";
+            for (const singleId of currentWishIds) {
+                const productMapData = await LoraProductsEngine.retrieveSingleProduct(singleId);
+                if (productMapData) {
+                    const trackingBasePriceNode = productMapData.sizesMatrix && productMapData.sizesMatrix.length > 0 ? productMapData.sizesMatrix[0] : { sizeLabel: 'Default', priceValue: 0 };
+                    htmlStringAccumulator += `
+                        <div class="product-luxury-card flex flex-col justify-between">
+                            <div>
+                                <img src="${productMapData.image}" class="w-full h-76 object-cover border border-zinc-100 mb-4">
+                                <h3 class="text-lg font-light text-zinc-900 mb-1">${LoraApp.state.lang === 'en' ? productMapData.nameEn : productMapData.nameAr}</h3>
+                            </div>
+                            <div class="flex justify-between items-center pt-4 border-t border-zinc-100">
+                                <span class="text-md font-bold text-zinc-900">$${trackingBasePriceNode.priceValue}</span>
+                                <a href="product.html?id=${productMapData.id}" class="text-xs uppercase tracking-widest bg-zinc-900 text-white px-4 py-2 hover:bg-amber-500 hover:text-black transition">View Profile</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            targetGrid.innerHTML = htmlStringAccumulator;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => populateWishlistView());
+    </script>
+</body>
+</html>
