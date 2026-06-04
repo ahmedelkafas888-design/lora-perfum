@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maison De Parfum | Haute Parfumerie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="store-container nav-wrapper">
+            <button id="langSwitcherBtn" class="text-xs tracking-widest uppercase font-bold text-amber-500">العربية</button>
+            <a href="index.html" class="text-2xl tracking-[0.2em] font-light luxury-heading gold-gradient-text">MAISON DE PARFUM</a>
+            <nav class="hidden md:flex gap-8">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="navHome">Home</a></li>
+                    <li><a href="products.html" data-i18n="navProducts">Fragrances</a></li>
+                    <li><a href="wishlist.html" data-i18n="navWishlist">Wishlist</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">Atelier Panel</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="wishlist.html" class="icon-btn">
+                    <span>♥</span>
+                    <span id="wishlistCountBadge" class="badge">0</span>
+                </a>
+                <a href="cart.html" class="icon-btn">
+                    <span>🛒</span>
+                    <span id="cartCountBadge" class="badge">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[90px]">
+        <section class="hero-slider" style="background-image: url('https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=2000&q=80')">
+            <div class="hero-overlay"></div>
+            <div class="store-container w-full">
+                <div class="hero-content">
+                    <h1 class="hero-title font-light" data-i18n="heroTitle">Sculpting Liquid Artistry</h1>
+                    <p class="text-zinc-400 mb-8 max-w-md" data-i18n="heroSubtitle">Experience haute parfumerie crafted for modern royalty.</p>
+                    <a href="products.html" class="premium-btn" data-i18n="discoverBtn">Explore Collections</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 bg-[#0c0c0c]">
+            <div class="store-container">
+                <h2 class="text-center text-3xl font-light tracking-widest luxury-heading mb-16 gold-gradient-text" data-i18n="categoryAll">Exquisite Compositions</h2>
+                <div id="featuredProductsLandingGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-black border-t border-zinc-800 py-12 text-center text-xs tracking-widest text-zinc-600">
+        <p>&copy; 2026 MAISON DE PARFUM BOUTIQUE. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { dbEngine } from "./firebase.js";
+        import { StoreApp } from "./script.js";
+        import { CartEngine } from "./cart.js";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const grid = document.getElementById("featuredProductsLandingGrid");
+            if (!grid) return;
+            try {
+                const items = await dbEngine.getCollection("products");
+                if (items.length === 0) {
+                    grid.innerHTML = `<p class="text-center text-zinc-500 col-span-full py-12">No compositions currently deployed globally.</p>`;
+                    return;
+                }
+                grid.innerHTML = items.slice(0, 3).map(p => `
+                    <div class="luxury-card p-6 flex flex-col justify-between">
+                        <div>
+                            <a href="product.html?id=${p.id}">
+                                <img src="${p.image}" class="w-full h-80 object-cover border border-zinc-800 mb-6 transition duration-700 hover:scale-105">
+                            </a>
+                            <h3 class="text-xl font-light mb-2 text-white">${StoreApp.state.lang === 'en' ? p.nameEn : p.nameAr}</h3>
+                            <p class="text-xs text-zinc-400 mb-4 line-clamp-2">${StoreApp.state.lang === 'en' ? p.descEn : p.descAr}</p>
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-zinc-800">
+                            <span class="text-lg text-amber-400 font-bold">$${p.price}</span>
+                            <button type="button" onclick="CartEngine.addToCart('${p.id}')" class="text-xs px-4 py-2 border border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black transition">Allocate To Trunk</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                grid.innerHTML = `<p class="text-center text-red-400 col-span-full py-12">Database connection latency detected. Please verify installation configurations.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
