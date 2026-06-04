@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Marcellus&family=Tajawal:wght@300;400;500;700&display=swap');
+
+:root {
+  --color-gold-50: #fbf8f3;
+  --color-gold-100: #f4ebd6;
+  --color-gold-200: #e8d7b1;
+  --color-gold-400: #c5a880;
+  --color-gold-600: #aa8453;
+  --color-gold-800: #7c5e37;
+  --color-onyx: #111111;
+  --color-charcoal: #1c1c1c;
+}
+
+/* Custom Selection Layouts */
+body {
+  font-family: 'Marcellus', 'Tajawal', serif;
+  background-color: var(--color-gold-50);
+  color: var(--color-onyx);
+  overflow-x: hidden;
+  transition: opacity 0.3s ease-in-out;
+}
+
+body[dir="rtl"] {
+  font-family: 'Tajawal', sans-serif;
+}
+
+.luxury-heading {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.15em;
+}
+
+body[dir="rtl"] .luxury-heading {
+  font-family: 'Tajawal', sans-serif;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+/* Premium Filter Dropdowns Customization */
+.luxury-input {
+  background-color: transparent;
+  border-bottom: 1px solid var(--color-gold-200);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.luxury-input:focus {
+  outline: none;
+  border-color: var(--color-gold-600);
+  padding-left: 8px;
+}
+body[dir="rtl"] .luxury-input:focus {
+  padding-left: 0;
+  padding-right: 8px;
+}
+
+/* Custom Luxury Soft Cards Transitions */
+.perfume-card {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.perfume-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(170, 132, 83, 0.12);
+}
+
+/* Luxury Hero Callouts Overlay Blur structures */
+.hero-overlay {
+  background: linear-gradient(to top, rgba(17, 17, 17, 0.85) 0%, rgba(17, 17, 17, 0.3) 60%, rgba(17, 17, 17, 0.1) 100%);
+}
+
+/* Micro Interactions Animations */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Scroll Handling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-onyx);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold-400);
+  border-radius: 3px;
+}
