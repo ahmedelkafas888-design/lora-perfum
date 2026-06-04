@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout Boutique | Maison De Parfum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="store-container nav-wrapper">
+            <button id="langSwitcherBtn" class="text-xs tracking-widest uppercase font-bold text-amber-500">العربية</button>
+            <a href="index.html" class="text-2xl tracking-[0.2em] font-light luxury-heading gold-gradient-text">MAISON DE PARFUM</a>
+            <nav class="hidden md:flex gap-8">
+                <ul class="nav-links">
+                    <li><a href="index.html" data-i18n="navHome">Home</a></li>
+                    <li><a href="products.html" data-i18n="navProducts">Fragrances</a></li>
+                    <li><a href="wishlist.html" data-i18n="navWishlist">Wishlist</a></li>
+                    <li><a href="admin.html" data-i18n="navAdmin">Atelier Panel</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="wishlist.html" class="icon-btn"><span>♥</span><span id="wishlistCountBadge" class="badge">0</span></a>
+                <a href="cart.html" class="icon-btn"><span>🛒</span><span id="cartCountBadge" class="badge">0</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[140px] store-container pb-24 max-w-4xl">
+        <h1 class="text-3xl font-light text-center mb-12 tracking-widest uppercase gold-gradient-text" data-i18n="checkoutTitle">Secure Boutique Checkout</h1>
+        
+        <form id="boutiqueDistributionCheckoutForm" class="bg-[#121212] border border-zinc-800 p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs uppercase text-zinc-400 tracking-wider mb-2">Full Name</label>
+                    <input type="text" id="custName" required class="luxury-input">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-zinc-400 tracking-wider mb-2">Phone Number</label>
+                    <input type="tel" id="custPhone" required class="luxury-input">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-xs uppercase text-zinc-400 tracking-wider mb-2">Governorate</label>
+                    <input type="text" id="custGov" required class="luxury-input">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-zinc-400 tracking-wider mb-2">City</label>
+                    <input type="text" id="custCity" required class="luxury-input">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-zinc-400 tracking-wider mb-2">Exact Delivery Address</label>
+                    <input type="text" id="custAddress" required class="luxury-input">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs uppercase text-zinc-400 tracking-wider mb-2">Manifest Notes / Delivery Instructions</label>
+                <textarea id="custNotes" rows="3" class="luxury-input"></textarea>
+            </div>
+            
+            <div class="pt-6 border-t border-zinc-800 flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-zinc-500 uppercase tracking-widest">Aggregate Total Billing</p>
+                    <p id="checkoutComputedValuationTotal" class="text-2xl text-amber-400 font-light">$0</p>
+                </div>
+                <button type="submit" class="premium-btn bg-amber-500 text-black font-bold border-none" data-i18n="placeOrder">Transmit Absolute Verification Order</button>
+            </div>
+        </form>
+    </main>
+
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { dbEngine } from "./firebase.js";
+        import { StoreApp } from "./script.js";
+
+        let finalTotalValue = 0;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const cart = StoreApp.state.cart;
+            const display = document.getElementById("checkoutComputedValuationTotal");
+            if(cart.length === 0) {
+                window.location.href = "cart.html";
+                return;
+            }
+
+            for(const item of cart) {
+                const prod = await dbEngine.getDocument("products", item.id);
+                if(prod) finalTotalValue += prod.price * item.qty;
+            }
+            display.innerText = `$${finalTotalValue}`;
+        });
+
+        document.getElementById("boutiqueDistributionCheckoutForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const orderPayload = {
+                customer: {
+                    name: document.getElementById("custName").value,
+                    phone: document.getElementById("custPhone").value,
+                    gov: document.getElementById("custGov").value,
+                    city: document.getElementById("custCity").value,
+                    address: document.getElementById("custAddress").value,
+                    notes: document.getElementById("custNotes").value
+                },
+                items: StoreApp.state.cart,
+                totalValuation: finalTotalValue,
+                status: "Pending Verification Log"
+            };
+
+            await dbEngine.createDocument("orders", orderPayload);
+            localStorage.removeItem("lux_perfume_cart");
+            StoreApp.showNotification("Order transmitted securely into processing cycle.");
+            setTimeout(() => window.location.href = "index.html", 2000);
+        });
+    </script>
+</body>
+</html>
