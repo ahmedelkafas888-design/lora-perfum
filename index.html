@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LORA | Haute Parfumerie</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@200;300;400;500;600&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <header>
+        <div class="nav-container">
+            <div class="lang-switch-wrapper">
+                <button onclick="toggleLanguageSystem()" class="lang-toggle-btn" id="lang-btn">العربية</button>
+            </div>
+            
+            <a href="index.html" class="logo">LORA</a>
+            
+            <div class="nav-icons">
+                <a href="admin.html" class="nav-admin-icon" title="Admin Dashboard">⚙️</a>
+                <a href="cart.html" class="cart-icon-wrapper">
+                    🛒 <span id="cart-badge" class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+        <nav class="sub-nav-menu">
+            <a href="index.html" class="active" data-i18n="nav_home">Home</a>
+            <a href="products.html?category=all" data-i18n="nav_collection">Collection</a>
+            <a href="products.html?category=Women" data-i18n="nav_women">Women Line</a>
+            <a href="products.html?category=Men" data-i18n="nav_men">Men Line</a>
+        </nav>
+    </header>
+
+    <section class="hero-luxury">
+        <div class="hero-luxury-overlay"></div>
+        <div class="hero-luxury-content">
+            <span class="hero-brand-sub" data-i18n="hero_sub">HAUTE PARFUMERIE</span>
+            <h1 class="hero-brand-title">LORA</h1>
+            <h2 class="hero-collection-title" data-i18n="hero_title">Luxury Perfume Collection</h2>
+            <p class="hero-description" data-i18n="hero_desc">Discover premium fragrances for men and women.</p>
+            
+            <div class="hero-promo-badge">
+                <span data-i18n="hero_promo_text">Exclusive Discounts & Special Offers</span>
+            </div>
+            
+            <a href="products.html" class="btn btn-hero-luxe" data-i18n="hero_cta">Shop Now</a>
+        </div>
+    </section>
+
+    <section class="container categories-grid">
+        <div class="category-card" onclick="window.location.href='products.html?category=Women'">
+            <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=1200&q=80" alt="Women's Luxury Fragrance">
+            <div class="category-overlay">
+                <div class="category-text-box">
+                    <span class="cat-sub-title">LA FEMME ELEGANTE</span>
+                    <h3>WOMEN’S COLLECTION</h3>
+                    <span class="cat-explore-btn">EXPLORE LINE</span>
+                </div>
+            </div>
+        </div>
+        <div class="category-card" onclick="window.location.href='products.html?category=Men'">
+            <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=1200&q=80" alt="Men's Luxury Fragrance">
+            <div class="category-overlay">
+                <div class="category-text-box">
+                    <span class="cat-sub-title">L'HOMME MODERNE</span>
+                    <h3>MEN’S COLLECTION</h3>
+                    <span class="cat-explore-btn">EXPLORE LINE</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title" data-i18n="featured_title">The Curated Masterpieces</h2>
+        <div id="featured-products" class="products-grid"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 LORA. <span data-i18n="footer_rights">All Rights Reserved.</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            applyLanguageDOM();
+            
+            const products = getProducts();
+            const featuredContainer = document.getElementById('featured-products');
+            featuredContainer.innerHTML = '';
+            
+            products.slice(0, 4).forEach(product => {
+                featuredContainer.innerHTML += createProductCard(product);
+            });
+            updateCartBadge();
+        });
+    </script>
+</body>
+</html>
