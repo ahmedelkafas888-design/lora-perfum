@@ -1,0 +1,97 @@
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const connectDB = require('./config/db.js');
+const apiRoutes = require('./routes/api.js');
+const Perfume = require('./models/Perfume.js');
+
+const app = express();
+
+// MIDDLEWARE ORCHESTRATION LAYER
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// CONNECT PERSISTENT DATABASE ENGINE
+connectDB().then(() => {
+    seedFallbackDatabaseRecords();
+});
+
+// ROUTING MATRIX INJECTIONS
+app.use('/api', apiRoutes);
+
+// Explicit administrative router bindings
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// Universal absolute fallback wildcard routing matrix
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// SEED DATA INITIALIZER
+async function seedFallbackDatabaseRecords() {
+    try {
+        const count = await Perfume.countDocuments();
+        if (count === 0) {
+            console.log("[System Database Audit] Empty state detected. Deploying premium default configurations safely...");
+            
+            const operationalMocks = [
+                {
+                    nameEn: "Oud Imperial Black",
+                    nameAr: "عود إمبيريال الأسود",
+                    descriptionEn: "A majestic symphony of dark Cambodian oud, absolute leather, and rare midnight rose extracts.",
+                    descriptionAr: "سمفونية مهيبة من العود الكمبودي الداكن، والجلود الفاخرة، ومستخلصات الورد الليلي النادرة.",
+                    category: "unisex",
+                    imageUrl: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=600&q=80",
+                    stock: 14,
+                    sizes: [
+                        { size: "50ml", price: 85 },
+                        { size: "100ml", price: 150 },
+                        { size: "200ml", price: 260 }
+                    ]
+                },
+                {
+                    nameEn: "Bleu Absolute Luxury",
+                    nameAr: "بلو أبسولوت الفاخر",
+                    descriptionEn: "Fresh oceanic mint combined with Sicilian cedar and deep aromatic incense trails.",
+                    descriptionAr: "انتعاش النعناع البحري الممزوج بخشب الأرز الصقلي ومسارات البخور العطرية العميقة.",
+                    category: "men",
+                    imageUrl: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=600&q=80",
+                    stock: 8,
+                    sizes: [
+                        { size: "30ml", price: 45 },
+                        { size: "50ml", price: 70 },
+                        { size: "100ml", price: 120 }
+                    ]
+                },
+                {
+                    nameEn: "Mystic Rose Petals",
+                    nameAr: "بتلات الورد الغامض",
+                    descriptionEn: "Velvety delicate Damascus rose, rich vanilla bean pod fusion, and crystalline warm white musk.",
+                    descriptionAr: "الورد الدمشقي المخملي الرقيق، ويدمج مع عود الفانيليا الغني، والمسك الأبيض الدافئ البلوري.",
+                    category: "women",
+                    imageUrl: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80",
+                    stock: 22,
+                    sizes: [
+                        { size: "50ml", price: 95 },
+                        { size: "100ml", price: 165 }
+                    ]
+                }
+            ];
+            
+            await Perfume.insertMany(operationalMocks);
+            console.log("[System Database Audit] Baseline setup successfully saved to the active database cluster.");
+        }
+    } catch (err) {
+        console.error("[System Database Error] Failed to seed default parameters safely:", err);
+    }
+}
+
+// SYSTEM LISTENING PORT APPOINTMENT SETUP
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`[Core System Operational Node Engine Running Securely On Local Interface Address: http://localhost:${PORT}`);
+});
