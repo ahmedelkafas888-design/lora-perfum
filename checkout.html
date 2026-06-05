@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+            margin-bottom: 60px;
+        }
+        .form-panel {
+            background: #ffffff;
+            border: 1px solid var(--gray-light);
+            padding: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            font-family: inherit;
+            font-size: 1rem;
+            background: var(--off-white);
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold-dark);
+        }
+        .review-panel {
+            background: var(--off-white);
+            border: 1px solid var(--gray-light);
+            padding: 30px;
+            height: fit-content;
+        }
+        .review-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        .review-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 1px solid var(--gray-light);
+        }
+        @media (max-width: 768px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="mobile-menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+            <a href="index.html" class="brand-logo">LORA</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+                <li><a href="products.html" data-i18n="nav_shop">Shop</a></li>
+                <li><a href="wishlist.html" data-i18n="nav_wishlist">Wishlist</a></li>
+                <li><a href="admin.html" data-i18n="nav_admin">Admin</a></li>
+            </ul>
+            <div class="nav-icons">
+                <button class="lang-btn" id="langToggle">العربية</button>
+                <a href="wishlist.html" class="nav-icon-btn">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge" id="wishlistCount">0</span>
+                </a>
+                <a href="cart.html" class="nav-icon-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="luxury-hero">
+        <h1 data-i18n="check_hero_title">Secure Checkout</h1>
+        <p data-i18n="check_hero_subtitle">Complete your transaction via premium WhatsApp redirection</p>
+    </header>
+
+    <main class="container">
+        <div class="checkout-grid">
+            <div class="form-panel">
+                <h3 class="summary-title" style="margin-top:0; margin-bottom:25px;" data-i18n="check_shipping_title">Shipping Details</h3>
+                <form id="checkoutForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="checkName" data-i18n="lbl_name">Full Name *</label>
+                        <input type="text" id="checkName" class="form-control" required autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkPhone" data-i18n="lbl_phone">Phone Number *</label>
+                        <input type="tel" id="checkPhone" class="form-control" required autocomplete="tel">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkCity" data-i18n="lbl_city">City / Governorate *</label>
+                        <input type="text" id="checkCity" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkAddress" data-i18n="lbl_address">Detailed Address *</label>
+                        <textarea id="checkAddress" class="form-control" rows="3" required style="resize:none; font-family:inherit;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-checkout-action" id="submitOrderBtn" style="width: 100%; margin-top: 15px;" data-i18n="btn_place_order">Confirm & Order via WhatsApp</button>
+                </form>
+            </div>
+
+            <div class="review-panel">
+                <h3 class="summary-title" style="margin-top:0;" data-i18n="check_summary_title">Review Items</h3>
+                <div id="checkoutItemsList">
+                    </div>
+                <div style="margin-top: 20px;">
+                    <div class="summary-row">
+                        <span data-i18n="subtotal_label">Subtotal</span>
+                        <span><span id="checkSubtotal">0.00</span> EGP</span>
+                    </div>
+                    <div class="summary-row discount">
+                        <span data-i18n="discount_label">Discount</span>
+                        <span>- <span id="checkDiscount">0.00</span> EGP</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span data-i18n="total_label">Final Total</span>
+                        <span><span id="checkTotal">0.00</span> EGP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="luxury-footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <h3 data-i18n="foot_about">LORA STORE</h3>
+                <p data-i18n="foot_about_text">An elite house of high luxury olfactory sensations.</p>
+            </div>
+            <div class="footer-col">
+                <h3 data-i18n="foot_links">NAVIGATION</h3>
+                <p><a href="products.html" data-i18n="nav_shop">Shop Collection</a></p>
+                <p><a href="cart.html" data-i18n="cart_label">Cart</a></p>
+            </div>
+            <div class="footer-col">
+                <h3 data-i18n="foot_contact">CONTACT</h3>
+                <p id="footerPhone">WhatsApp: Loading...</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { db, doc, getDoc, updateDoc } from './firebase.js';
+        import { runGlobalTranslationsEngine, updateLayoutBadges, pullDynamicStoreMetadata } from './script.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateLayoutBadges();
+            await pullDynamicStoreMetadata();
+
+            const mToggle = document.getElementById('menuToggle');
+            const linksMenu = document.getElementById('navLinks');
+            if (mToggle && linksMenu) {
+                mToggle.addEventListener('click', () => linksMenu.classList.toggle('open'));
+            }
+
+            const activeCouponData = JSON.parse(sessionStorage.getItem('appliedCoupon') || 'null');
+            let purchasePayload = [];
+            
+            const buyNowObj = JSON.parse(sessionStorage.getItem('buyNowItem') || 'null');
+            if (buyNowObj) {
+                purchasePayload.push(buyNowObj);
+            } else {
+                purchasePayload = JSON.parse(localStorage.getItem('lora_cart') || '[]');
+            }
+
+            if (purchasePayload.length === 0) {
+                document.getElementById('checkoutItemsList').innerHTML = `<p style="padding:20px 0; text-align:center;">No items found to checkout.</p>`;
+                document.getElementById('submitOrderBtn').disabled = true;
+                runGlobalTranslationsEngine();
+                return;
+            }
+
+            let computedSubtotal = 0;
+            let containerHtml = '';
+
+            purchasePayload.forEach(item => {
+                const sub = parseFloat(item.price) * parseInt(item.quantity || 1);
+                computedSubtotal += sub;
+                containerHtml += `
+                    <div class="review-item">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <img src="${item.imageUrl}" alt="${item.title}">
+                            <div>
+                                <h4 style="font-family:'Playfair Display',serif; margin:0 0 5px 0;">${item.title}</h4>
+                                <p style="font-size:0.8rem; color:var(--gray-muted); margin:0;">${item.size || '100'} ML x ${item.quantity || 1}</p>
+                            </div>
+                        </div>
+                        <span style="font-weight:600;">${sub.toFixed(2)} EGP</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('checkoutItemsList').innerHTML = containerHtml;
+
+            let computedDiscount = 0;
+            if (activeCouponData) {
+                if (activeCouponData.type === 'percentage') {
+                    computedDiscount = (computedSubtotal * parseFloat(activeCouponData.value)) / 100;
+                } else {
+                    computedDiscount = parseFloat(activeCouponData.value);
+                }
+            }
+
+            const computedTotal = Math.max(0, computedSubtotal - computedDiscount);
+
+            document.getElementById('checkSubtotal').innerText = computedSubtotal.toFixed(2);
+            document.getElementById('checkDiscount').innerText = computedDiscount.toFixed(2);
+            document.getElementById('checkTotal').innerText = computedTotal.toFixed(2);
+
+            document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const clientName = document.getElementById('checkName').value.trim();
+                const clientPhone = document.getElementById('checkPhone').value.trim();
+                const clientCity = document.getElementById('checkCity').value.trim();
+                const clientAddress = document.getElementById('checkAddress').value.trim();
+
+                if(!clientName || !clientPhone || !clientCity || !clientAddress) {
+                    alert('Please complete all fields.');
+                    return;
+                }
+
+                // Deduct stock limits securely 
+                for (const item of purchasePayload) {
+                    try {
+                        const productRef = doc(db, "products", item.id);
+                        const productSnap = await getDoc(productRef);
+                        if (productSnap.exists()) {
+                            const currentStock = parseInt(productSnap.data().stock || 0);
+                            const orderedQty = parseInt(item.quantity || 1);
+                            const updatedStock = Math.max(0, currentStock - orderedQty);
+                            await updateDoc(productRef, { stock: updatedStock });
+                        }
+                    } catch (err) {
+                        console.error("Stock adjustment failed for item ID: " + item.id, err);
+                    }
+                }
+
+                // Pull absolute up-to-date business configuration variables from DB
+                let waNumber = "201000000000";
+                try {
+                    const storeSnap = await getDoc(doc(db, "settings", "store_config"));
+                    if(storeSnap.exists() && storeSnap.data().whatsapp) {
+                        waNumber = storeSnap.data().whatsapp.replace(/[^0-9]/g, "");
+                    }
+                } catch(err) {
+                    console.error("Config fetch error during dynamic messaging context compilation", err);
+                }
+
+                let messageText = `*LORA LUXURY ORDER CONFIRMATION*\n`;
+                messageText += `--------------------------------------\n`;
+                messageText += `*Customer Details:*\n`;
+                messageText += `• Name: ${clientName}\n`;
+                messageText += `• Phone: ${clientPhone}\n`;
+                messageText += `• Destination City: ${clientCity}\n`;
+                messageText += `• Exact Address: ${clientAddress}\n\n`;
+                messageText += `*Ordered Items:*\n`;
+
+                purchasePayload.forEach((item, idx) => {
+                    messageText += `${idx + 1}. ${item.title} (${item.size || '100'} ML) x${item.quantity || 1} - ${(parseFloat(item.price)*parseInt(item.quantity || 1)).toFixed(2)} EGP\n`;
+                });
+
+                messageText += `\n--------------------------------------\n`;
+                messageText += `• Subtotal: ${computedSubtotal.toFixed(2)} EGP\n`;
+                if (computedDiscount > 0) {
+                    messageText += `• Promo Discount Applied: -${computedDiscount.toFixed(2)} EGP\n`;
+                }
+                messageText += `• *Grand Net Total: ${computedTotal.toFixed(2)} EGP*\n\n`;
+                messageText += `Thank you for shopping at LORA High Luxury.`;
+
+                if (!buyNowObj) {
+                    localStorage.removeItem('lora_cart');
+                } else {
+                    sessionStorage.removeItem('buyNowItem');
+                }
+                sessionStorage.removeItem('appliedCoupon');
+
+                const finalUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(messageText)}`;
+                window.location.href = finalUrl;
+            });
+
+            runGlobalTranslationsEngine();
+        });
+    </script>
+</body>
+</html>
