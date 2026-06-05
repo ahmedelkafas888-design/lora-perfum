@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="mobile-menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+            <a href="index.html" class="brand-logo">LORA</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+                <li><a href="products.html" data-i18n="nav_shop">Shop</a></li>
+                <li><a href="wishlist.html" data-i18n="nav_wishlist">Wishlist</a></li>
+                <li><a href="admin.html" data-i18n="nav_admin">Admin</a></li>
+            </ul>
+            <div class="nav-icons">
+                <button class="lang-btn" id="langToggle">العربية</button>
+                <a href="wishlist.html" class="nav-icon-btn">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge" id="wishlistCount">0</span>
+                </a>
+                <a href="cart.html" class="nav-icon-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="luxury-hero">
+        <h1 data-i18n="wish_hero_title">Your Curated Wishlist</h1>
+        <p data-i18n="wish_hero_subtitle">Saved premium preferences reserved for your consideration</p>
+    </header>
+
+    <main class="container">
+        <div class="product-grid" id="wishlistGridContainer">
+            </div>
+    </main>
+
+    <footer class="luxury-footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <h3 data-i18n="foot_about">LORA STORE</h3>
+                <p data-i18n="foot_about_text">An elite house of high luxury olfactory sensations.</p>
+            </div>
+            <div class="footer-col">
+                <h3 data-i18n="foot_links">NAVIGATION</h3>
+                <p><a href="products.html" data-i18n="nav_shop">Shop Collection</a></p>
+                <p><a href="cart.html" data-i18n="cart_label">Cart</a></p>
+            </div>
+            <div class="footer-col">
+                <h3 data-i18n="foot_contact">CONTACT</h3>
+                <p id="footerPhone">WhatsApp: Loading...</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { runGlobalTranslationsEngine, updateLayoutBadges, pullDynamicStoreMetadata } from './script.js';
+
+        function renderWishlistCollection() {
+            const wishlistItems = JSON.parse(localStorage.getItem('lora_wishlist') || '[]');
+            const container = document.getElementById('wishlistGridContainer');
+            
+            if (wishlistItems.length === 0) {
+                container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: var(--gray-muted);" data-i18n="wish_empty">Your wishlist is empty.</p>`;
+                runGlobalTranslationsEngine();
+                return;
+            }
+
+            let htmlPayload = '';
+            wishlistItems.forEach(item => {
+                htmlPayload += `
+                    <div class="product-card" id="wish-card-${item.id}">
+                        <div class="product-img-wrapper">
+                            <img src="${item.imageUrl}" class="product-img" alt="${item.title}">
+                            <button class="wishlist-btn" onclick="removeFromWishlistEngine('${item.id}')" style="color: var(--red-alert);">
+                                <i class="fa-solid fa-heart"></i>
+                            </button>
+                        </div>
+                        <div class="product-details">
+                            <h3 class="product-title">${item.title}</h3>
+                            <p class="product-meta">${item.size || '100'} ML</p>
+                            <div class="price-container">
+                                <span class="current-price">${item.price} EGP</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="card-btn" onclick="moveFromWishlistToCart('${item.id}', '${btoa(encodeURIComponent(item.title))}', ${parseFloat(item.price)}, '${item.imageUrl}', '${item.size || '100'}')" data-i18n="add_to_cart_btn" style="flex: 1;">Add To Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlPayload;
+            runGlobalTranslationsEngine();
+        }
+
+        window.removeFromWishlistEngine = function(id) {
+            let items = JSON.parse(localStorage.getItem('lora_wishlist') || '[]');
+            items = items.filter(x => x.id !== id);
+            localStorage.setItem('lora_wishlist', JSON.stringify(items));
+            updateLayoutBadges();
+            renderWishlistCollection();
+        };
+
+        window.moveFromWishlistToCart = function(id, base64Title, price, imgUrl, size) {
+            const rawTitle = decodeURIComponent(atob(base64Title));
+            if (window.addToCartEngine) {
+                window.addToCartEngine(id, rawTitle, price, imgUrl, size);
+            } else {
+                let cart = JSON.parse(localStorage.getItem('lora_cart') || '[]');
+                const idx = cart.findIndex(c => c.id === id);
+                if (idx > -1) {
+                    cart[idx].quantity = (cart[idx].quantity || 1) + 1;
+                } else {
+                    cart.push({ id, title: rawTitle, price, imageUrl: imgUrl, size, quantity: 1 });
+                }
+                localStorage.setItem('lora_cart', JSON.stringify(cart));
+                alert(`${rawTitle} added to your luxury cart!`);
+                updateLayoutBadges();
+            }
+            window.removeFromWishlistEngine(id);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLayoutBadges();
+            pullDynamicStoreMetadata();
+            renderWishlistCollection();
+
+            const mToggle = document.getElementById('menuToggle');
+            const linksMenu = document.getElementById('navLinks');
+            if (mToggle && linksMenu) {
+                mToggle.addEventListener('click', () => linksMenu.classList.toggle('open'));
+            }
+        });
+    </script>
+</body>
+</html>
