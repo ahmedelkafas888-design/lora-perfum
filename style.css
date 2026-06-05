@@ -1,0 +1,787 @@
+/* ==========================================================================
+   LORA LUXURY PERFUME STORE - PRODUCTION READY MASTER CASCADING STYLESHEET
+   WHITE & GOLD LUXURY THEME
+   ========================================================================== */
+
+:root {
+    --gold-bright: #FFD700;
+    --gold-light: #E6C687;
+    --gold-dark: #C5A059;
+    --charcoal: #111111;
+    --off-white: #F9F9F9;
+    --gray-light: #EAEAEA;
+    --gray-muted: #888888;
+    --red-alert: #A94442;
+    --green-success: #3C763D;
+    
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Montserrat', Helvetica, Arial, sans-serif;
+    --font-arabic: 'Cairo', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #ffffff;
+    color: var(--charcoal);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+body.rtl-mode {
+    font-family: var(--font-arabic), var(--font-sans);
+    direction: rtl;
+}
+
+/* --- TOP ALERT PROMO BAR --- */
+.top-promo-banner {
+    background-color: var(--charcoal);
+    color: var(--gold-light);
+    text-align: center;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--gold-dark);
+    text-transform: uppercase;
+}
+
+/* --- NAVIGATION HEADER --- */
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--gray-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 80px;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 30px;
+}
+
+.brand-logo {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.brand-logo:hover {
+    color: var(--gold-dark);
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 35px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--charcoal);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: color 0.3s;
+    position: relative;
+    padding: 5px 0;
+}
+
+.nav-links a:hover {
+    color: var(--gold-dark);
+}
+
+.nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--charcoal);
+    font-size: 1.25rem;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.nav-icon-btn:hover {
+    color: var(--gold-dark);
+}
+
+.nav-icon-btn .badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: var(--gold-dark);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+}
+
+body.rtl-mode .nav-icon-btn .badge {
+    left: -10px;
+    right: auto;
+}
+
+.lang-btn {
+    background: transparent;
+    border: 1px solid var(--charcoal);
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    background-color: var(--charcoal);
+    color: #ffffff;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--charcoal);
+    cursor: pointer;
+}
+
+/* --- LUXURY HERO BLOCK --- */
+.luxury-hero {
+    background-color: var(--off-white);
+    border-bottom: 1px solid var(--gray-light);
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.luxury-hero h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: 400;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.luxury-hero p {
+    font-size: 0.95rem;
+    color: var(--gray-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* --- LAYOUT GRID CONTENT CONTAINER --- */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+/* --- SHOWROOM TABS --- */
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--gray-light);
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 25px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gray-muted);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-btn.active, .tab-btn:hover {
+    color: var(--gold-dark);
+}
+
+/* --- PRODUCT MATRICES SHOWROOM GRID --- */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.product-card {
+    background-color: #ffffff;
+    border: 1px solid var(--gray-light);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.product-img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 115%;
+    background-color: var(--off-white);
+    overflow: hidden;
+}
+
+.product-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.04);
+}
+
+.wishlist-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: var(--charcoal);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+body.rtl-mode .wishlist-btn {
+    left: 15px;
+    right: auto;
+}
+
+.wishlist-btn:hover {
+    color: var(--red-alert);
+}
+
+/* SYSTEM BADGES STRUCTURAL RULES */
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: var(--gold-dark);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    letter-spacing: 0.5px;
+    z-index: 10;
+}
+
+body.rtl-mode .discount-badge {
+    right: 15px;
+    left: auto;
+}
+
+.sold-out-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--red-alert);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    z-index: 20;
+}
+
+.low-stock-warning-badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(197, 160, 89, 0.9);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 5px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 22;
+}
+
+.product-details {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    border-top: 1px solid var(--gray-light);
+}
+
+.product-title {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    margin-bottom: 6px;
+    color: var(--charcoal);
+}
+
+.product-meta {
+    font-size: 0.75rem;
+    color: var(--gray-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.price-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.current-price {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--charcoal);
+}
+
+.old-price {
+    font-size: 0.9rem;
+    color: var(--gray-muted);
+    text-decoration: line-through;
+}
+
+.card-btn {
+    background-color: var(--charcoal);
+    color: #ffffff;
+    border: none;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.card-btn:hover {
+    background-color: var(--gold-dark);
+    color: #ffffff;
+}
+
+.card-btn:disabled {
+    background-color: var(--gray-light) !important;
+    color: var(--gray-muted) !important;
+    border: none !important;
+    cursor: not-allowed;
+}
+
+/* --- SPLIT FRAMEWORK CORES FOR SEPARATED PANEL INTERFACES --- */
+.workspace-split {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+    margin-top: 40px;
+    margin-bottom: 60px;
+}
+
+.items-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.summary-panel {
+    background-color: var(--off-white);
+    border: 1px solid var(--gray-light);
+    padding: 30px;
+    height: fit-content;
+}
+
+/* --- DYNAMIC CART ELEMENTS MATRICES STRUCTURAL FRAMEWORK --- */
+.cart-row-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid var(--gray-light);
+    background-color: #ffffff;
+}
+
+.cart-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cart-item-meta img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid var(--gray-light);
+}
+
+.cart-item-title {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.cart-item-spec {
+    font-size: 0.8rem;
+    color: var(--gray-muted);
+    margin-bottom: 4px;
+}
+
+.cart-item-price-unit {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.qty-stepper {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--gray-light);
+    background-color: var(--off-white);
+}
+
+.step-btn {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.step-btn:hover {
+    background-color: var(--gray-light);
+}
+
+.qty-val {
+    width: 35px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.cart-item-subtotal {
+    font-weight: 700;
+    font-size: 1rem;
+    width: 110px;
+    text-align: right;
+}
+
+body.rtl-mode .cart-item-subtotal {
+    text-align: left;
+}
+
+.cart-remove-btn {
+    background: transparent;
+    border: none;
+    color: var(--gray-muted);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.cart-remove-btn:hover {
+    color: var(--red-alert);
+}
+
+/* --- SUMMARY BOXES --- */
+.summary-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--gray-light);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.promo-box {
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--gray-light);
+    padding-bottom: 20px;
+}
+
+.promo-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.promo-row {
+    display: flex;
+    gap: 10px;
+}
+
+.promo-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-light);
+    background-color: #ffffff;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.promo-input:focus {
+    outline: none;
+    border-color: var(--gold-dark);
+}
+
+.promo-btn {
+    background-color: var(--charcoal);
+    color: #ffffff;
+    border: none;
+    padding: 0 20px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.promo-btn:hover {
+    background-color: var(--gold-dark);
+}
+
+.feedback-msg {
+    font-size: 0.8rem;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.feedback-msg.success { color: var(--green-success); }
+.feedback-msg.error { color: var(--red-alert); }
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+.summary-row.discount {
+    color: var(--green-success);
+    font-weight: 500;
+}
+
+.summary-row.total {
+    border-top: 1px solid var(--gray-light);
+    margin-top: 15px;
+    padding-top: 15px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--charcoal);
+}
+
+.btn-checkout-action {
+    display: block;
+    background-color: var(--charcoal);
+    color: #ffffff;
+    border: none;
+    padding: 15px 30px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-checkout-action:hover {
+    background-color: var(--gold-dark);
+    color: #ffffff;
+}
+
+.btn-checkout-action:disabled {
+    background-color: var(--gray-light) !important;
+    color: var(--gray-muted) !important;
+    cursor: not-allowed;
+}
+
+/* STOCK MANAGEMENT ALERTS INDICATORS IN TABLES */
+span.low-stock {
+    color: var(--gold-dark);
+    font-weight: 700;
+}
+
+/* --- THE SIGNATURE LUXURY FOOTER BRANDING ARCHITECTURE --- */
+.luxury-footer {
+    background-color: var(--off-white);
+    border-top: 1px solid var(--gray-light);
+    padding: 60px 0;
+    margin-top: auto;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+}
+
+.footer-col h3 {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.footer-col p {
+    font-size: 0.9rem;
+    color: var(--gray-muted);
+    margin-bottom: 10px;
+}
+
+.footer-col a {
+    color: var(--gray-muted);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-col a:hover {
+    color: var(--gold-dark);
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT ENGINE MEDIA QUERIES MATRIX
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    .workspace-split {
+        grid-template-columns: 1fr;
+    }
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        border-bottom: 1px solid var(--gray-light);
+        flex-direction: column;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+        z-index: 999;
+    }
+    
+    body.rtl-mode .nav-links {
+        left: auto;
+        right: 0;
+    }
+
+    .nav-links.open {
+        max-height: 300px;
+    }
+
+    .nav-links li {
+        width: 100%;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 15px 30px;
+        border-bottom: 1px solid var(--off-white);
+    }
+    
+    .cart-row-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .cart-item-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
