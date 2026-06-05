@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Montserrat:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container"><a href="index.html" class="brand-logo">LORA</a></div>
+    </nav>
+    <main class="container">
+        <h1 class="luxury-title" style="margin-top:20px;">SECURE CHECKOUT</h1>
+        <div class="workspace-split" style="margin-top:30px;">
+            <div class="items-panel">
+                <h3 class="summary-title">Shipping & Delivery Details</h3>
+                <form id="orderForm">
+                    <div class="form-group"><label>Customer Full Name</label><input type="text" id="formName" class="form-control" required></div>
+                    <div class="form-group"><label>Mobile Phone Number</label><input type="tel" id="formPhone" class="form-control" required></div>
+                    <div class="form-group"><label>Complete Shipping Address</label><textarea id="formAddress" class="form-control" rows="4" required></textarea></div>
+                    <button type="submit" class="btn-checkout-action">PLACE ORDER VIA WHATSAPP</button>
+                </form>
+            </div>
+            <div class="summary-panel">
+                <h3 class="summary-title">Review Items</h3>
+                <div id="checkoutItemsList" style="margin-bottom:15px;"></div>
+                
+                <div class="promo-box">
+                    <label class="promo-label">Active Promo Code</label>
+                    <div class="promo-row">
+                        <input type="text" id="checkoutCouponField" class="promo-input">
+                        <button id="checkoutApplyCouponBtn" class="promo-btn">Apply</button>
+                    </div>
+                    <div id="checkoutCouponFeedback" class="feedback-msg"></div>
+                </div>
+
+                <div class="summary-row"><span>Subtotal</span><span><span id="chkSub">0.00</span> EGP</span></div>
+                <div class="summary-row discount"><span>Discount</span><span>-<span id="chkDisc">0.00</span> EGP</span></div>
+                <div class="summary-row total"><span>Final Total</span><span><span id="chkTot">0.00</span> EGP</span></div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, getDoc, collection, addDoc } from './firebase.js';
+
+        let isDirect = new URLSearchParams(window.location.search).get('direct') === 'true';
+        let processingItems = [];
+        let discountPct = parseFloat(localStorage.getItem('lora_active_discount_pct') || '0');
+
+        function setupCheckoutReview() {
+            if(isDirect) {
+                const item = JSON.parse(localStorage.getItem('lora_direct_item'));
+                if(item) processingItems = [item];
+            } else {
+                processingItems = JSON.parse(localStorage.getItem('lora_cart') || '[]');
+            }
+            renderReviewRows();
+            calculateCheckoutTotals();
+        }
+
+        function renderReviewRows() {
+            document.getElementById('checkoutItemsList').innerHTML = processingItems.map(i => `
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:8px;">
+                    <span>${i.title} (${i.size}ml) x${i.qty}</span>
+                    <span>${(i.price * i.qty)} EGP</span>
+                </div>
+            `).join('');
+        }
+
+        function calculateCheckoutTotals() {
+            let sub = processingItems.reduce((a, c) => a + (c.price * c.qty), 0);
+            let disc = sub * (discountPct / 100);
+            let tot = sub - disc;
+
+            document.getElementById('chkSub').innerText = sub.toFixed(2);
+            document.getElementById('chkDisc').innerText = disc.toFixed(2);
+            document.getElementById('chkTot').innerText = tot.toFixed(2);
+
+            const activeCode = localStorage.getItem('lora_active_coupon_code');
+            if(activeCode) {
+                document.getElementById('checkoutCouponField').value = activeCode;
+                document.getElementById('checkoutCouponFeedback').className = "feedback-msg success";
+                document.getElementById('checkoutCouponFeedback').innerText = `Code Active: ${discountPct}% off`;
+            }
+        }
+
+        document.getElementById('checkoutApplyCouponBtn').addEventListener('click', async () => {
+            const code = document.getElementById('checkoutCouponField').value.trim().toUpperCase();
+            const feed = document.getElementById('checkoutCouponFeedback');
+            if(!code) return;
+
+            const snap = await getDoc(doc(db, "coupons", code));
+            if(snap.exists() && snap.data().active) {
+                discountPct = parseFloat(snap.data().percentage || 0);
+                localStorage.setItem('lora_active_discount_pct', discountPct);
+                localStorage.setItem('lora_active_coupon_code', code);
+                feed.className = "feedback-msg success";
+                feed.innerText = "Coupon synched successfully!";
+                calculateCheckoutTotals();
+            } else {
+                feed.className = "feedback-msg error";
+                feed.innerText = "Invalid coupon code.";
+            }
+        });
+
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(processingItems.length === 0) return;
+
+            const name = document.getElementById('formName').value;
+            const phone = document.getElementById('formPhone').value;
+            const address = document.getElementById('formAddress').value;
+
+            // Log Order directly inside Firestore
+            const orderPayload = {
+                customerName: name,
+                customerPhone: phone,
+                shippingAddress: address,
+                items: processingItems,
+                subtotal: parseFloat(document.getElementById('chkSub').innerText),
+                discount: parseFloat(document.getElementById('chkDisc').innerText),
+                total: parseFloat(document.getElementById('chkTot').innerText),
+                timestamp: Date.now()
+            };
+
+            await addDoc(collection(db, "orders"), orderPayload);
+
+            // Fetch central WhatsApp configurations
+            const storeSnap = await getDoc(doc(db, "store", "settings"));
+            let waNum = "201000000000";
+            if(storeSnap.exists() && storeSnap.data().whatsapp) {
+                waNum = storeSnap.data().whatsapp;
+            }
+
+            let messageText = `*LORA PERFUME STORE ORDER*\n\n`;
+            messageText += `*Name:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n\n`;
+            messageText += `*Ordered Items:*\n`;
+            processingItems.forEach(i => {
+                messageText += `- ${i.title} (${i.size}ml) x${i.qty} -> ${i.price * i.qty} EGP\n`;
+            });
+            messageText += `\n*Final Paid Total:* ${document.getElementById('chkTot').innerText} EGP`;
+
+            if(!isDirect) localStorage.removeItem('lora_cart');
+            localStorage.removeItem('lora_active_discount_pct');
+            localStorage.removeItem('lora_active_coupon_code');
+
+            window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(messageText)}`, '_blank');
+        });
+
+        setupCheckoutReview();
+    </script>
+</body>
+</html>
