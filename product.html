@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .detail-wrapper { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 40px; 
+            margin-top: 30px; 
+            margin-bottom: 50px;
+        }
+        .detail-img-container {
+            position: relative;
+            width: 100%;
+            background: var(--off-white);
+            border: 1px solid var(--gray-light);
+        }
+        .detail-img { 
+            width: 100%; 
+            height: auto; 
+            display: block;
+            object-fit: cover; 
+        }
+        .detail-info { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        .detail-meta-row { 
+            margin: 15px 0; 
+            font-size: 0.95rem; 
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 768px) {
+            .detail-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="mobile-menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+            <a href="index.html" class="brand-logo">LORA</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+                <li><a href="products.html" data-i18n="nav_shop">Shop</a></li>
+                <li><a href="wishlist.html" data-i18n="nav_wishlist">Wishlist</a></li>
+                <li><a href="admin.html" data-i18n="nav_admin">Admin</a></li>
+            </ul>
+            <div class="nav-icons">
+                <button class="lang-btn" id="langToggle">العربية</button>
+                <a href="wishlist.html" class="nav-icon-btn">
+                    <i class="fa-regular fa-heart"></i>
+                    <span class="badge" id="wishlistCount">0</span>
+                </a>
+                <a href="cart.html" class="nav-icon-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="badge" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="detail-wrapper" id="productDetailView">
+            </div>
+    </main>
+
+    <footer class="luxury-footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <h3 data-i18n="foot_about">LORA STORE</h3>
+                <p data-i18n="foot_about_text">An elite house of high luxury olfactory sensations.</p>
+            </div>
+            <div class="footer-col">
+                <h3 data-i18n="foot_links">NAVIGATION</h3>
+                <p><a href="products.html" data-i18n="nav_shop">Shop Collection</a></p>
+                <p><a href="cart.html" data-i18n="cart_label">Cart</a></p>
+            </div>
+            <div class="footer-col">
+                <h3 data-i18n="foot_contact">CONTACT</h3>
+                <p id="footerPhone">WhatsApp: Loading...</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { db, doc, getDoc } from './firebase.js';
+        import { runGlobalTranslationsEngine, updateLayoutBadges, pullDynamicStoreMetadata } from './script.js';
+
+        const params = new URLSearchParams(window.location.search);
+        const pid = params.get('id');
+
+        async function fetchSelectedProduct() {
+            if (!pid) {
+                document.getElementById('productDetailView').innerHTML = `<p style="text-align:center; grid-column:1/-1;">No product selected.</p>`;
+                return;
+            }
+            
+            try {
+                const snap = await getDoc(doc(db, "products", pid));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const stockCount = parseInt(data.stock || 0);
+                    const isOut = stockCount <= 0;
+                    const isLow = stockCount > 0 && stockCount <= 3;
+                    
+                    let stockHtml = '';
+                    if (isOut) {
+                        stockHtml = `<span style="color:var(--red-alert); font-weight:bold; text-transform:uppercase;">SOLD OUT</span>`;
+                    } else if (isLow) {
+                        stockHtml = `<span style="color:var(--gold-dark); font-weight:bold; text-transform:uppercase;">Only ${stockCount} left</span>`;
+                    } else {
+                        stockHtml = `<span style="color:var(--green-success); font-weight:bold; text-transform:uppercase;">In Stock</span>`;
+                    }
+
+                    let priceHtml = '';
+                    let badgeHtml = '';
+                    if (data.discountPrice && parseFloat(data.discountPrice) < parseFloat(data.price)) {
+                        const pct = Math.round(((data.price - data.discountPrice) / data.price) * 100);
+                        badgeHtml = `<div class="discount-badge" style="top:20px; left:20px;">${pct}% OFF</div>`;
+                        priceHtml = `<span class="current-price" style="font-size:1.6rem;">${data.discountPrice} EGP</span><span class="old-price" style="font-size:1.2rem; margin-left:10px; text-decoration:line-through; color:var(--gray-muted);">${data.price} EGP</span>`;
+                    } else {
+                        priceHtml = `<span class="current-price" style="font-size:1.6rem;">${data.price} EGP</span>`;
+                    }
+                    
+                    document.getElementById('productDetailView').innerHTML = `
+                        <div class="detail-img-container">
+                            ${badgeHtml}
+                            <img src="${data.imageUrl}" class="detail-img" alt="${data.title}">
+                        </div>
+                        <div class="detail-info">
+                            <h1 class="luxury-title" style="text-align:left; margin-bottom:10px;">${data.title}</h1>
+                            <p style="color:var(--gold-dark); text-transform:uppercase; font-size:0.85rem; letter-spacing:1.5px; margin-bottom:20px;">Category: ${data.category || 'Unisex'}</p>
+                            <div class="price-container" style="justify-content:flex-start; margin-bottom:20px;">${priceHtml}</div>
+                            <div class="detail-meta-row"><strong>Size:</strong> ${data.size || '100'} ML</div>
+                            <div class="detail-meta-row"><strong>Availability:</strong> ${stockHtml}</div>
+                            
+                            <div style="display:flex; gap:15px; margin-top:30px;">
+                                <button class="btn-checkout-action" id="detailAddCartBtn" ${isOut ? 'disabled' : ''} style="background:transparent; color:var(--charcoal); border:1px solid var(--charcoal);">ADD TO CART</button>
+                                <button class="btn-checkout-action" id="detailBuyBtn" ${isOut ? 'disabled' : ''}>BUY NOW DIRECTLY</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (!isOut) {
+                        document.getElementById('detailAddCartBtn').addEventListener('click', () => {
+                            window.addToCartEngine(pid, data.title, data.discountPrice || data.price, data.imageUrl, data.size || '100');
+                        });
+
+                        document.getElementById('detailBuyBtn').addEventListener('click', () => {
+                            window.buyNowEngine(pid, data.title, data.discountPrice || data.price, data.imageUrl, data.size || '100');
+                        });
+                    }
+                    
+                    runGlobalTranslationsEngine();
+                } else {
+                    document.getElementById('productDetailView').innerHTML = `<p style="text-align:center; grid-column:1/-1;">Product not found.</p>`;
+                }
+            } catch (err) {
+                document.getElementById('productDetailView').innerHTML = `<p style="text-align:center; grid-column:1/-1; color:var(--red-alert);">Error loading product details.</p>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSelectedProduct();
+            updateLayoutBadges();
+            pullDynamicStoreMetadata();
+            
+            const mToggle = document.getElementById('menuToggle');
+            const linksMenu = document.getElementById('navLinks');
+            if (mToggle && linksMenu) {
+                mToggle.addEventListener('click', () => linksMenu.classList.toggle('open'));
+            }
+        });
+    </script>
+</body>
+</html>
