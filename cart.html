@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="brand-logo">LORA</a>
+            <ul class="nav-links">
+                <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+                <li><a href="products.html" data-i18n="nav_shop">Shop</a></li>
+            </ul>
+            <div class="nav-icons">
+                <button class="lang-btn" id="langToggle">العربية</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="luxury-hero">
+        <h1 data-i18n="cart_hero_title">Your Shopping Cart</h1>
+        <p data-i18n="cart_hero_subtitle">Luxury Awaits Your Final Command</p>
+    </header>
+
+    <main class="container">
+        <div class="workspace-split">
+            <div class="items-panel" id="cartItemsList">
+                </div>
+
+            <div class="summary-panel">
+                <h3 class="summary-title" data-i18n="summary_title">Order Summary</h3>
+                
+                <div class="promo-box">
+                    <label class="promo-label" data-i18n="coupon_label">Have a promo code?</label>
+                    <div class="promo-row">
+                        <input type="text" id="couponInput" class="promo-input" placeholder="CODE">
+                        <button id="applyCouponBtn" class="promo-btn" data-i18n="coupon_apply">Apply</button>
+                    </div>
+                    <div id="couponFeedback" class="feedback-msg"></div>
+                </div>
+
+                <div class="summary-row">
+                    <span data-i18n="subtotal_label">Subtotal</span>
+                    <span><span id="subtotalVal">0.00</span> AED</span>
+                </div>
+                <div class="summary-row discount">
+                    <span data-i18n="discount_label">Discount</span>
+                    <span>-<span id="discountVal">0.00</span> AED</span>
+                </div>
+                <div class="summary-row total">
+                    <span data-i18n="total_label">Final Total</span>
+                    <span><span id="totalVal">0.00</span> AED</span>
+                </div>
+
+                <button class="btn-checkout-action" id="proceedToCheckoutBtn" data-i18n="checkout_btn">Proceed To Checkout</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="cart.js"></script>
+</body>
+</html>
