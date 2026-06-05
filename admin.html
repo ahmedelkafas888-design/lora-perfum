@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="brand-logo">LORA CONTROL</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="admin-grid">
+            <div class="admin-form-card">
+                <h3 style="margin-bottom:20px; text-transform:uppercase; letter-spacing:1px;">Add Luxury Product</h3>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>Product Title</label>
+                        <input type="text" id="prodTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <input type="text" id="prodBrand" class="form-control" placeholder="LORA">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (AED)</label>
+                        <input type="number" id="prodPrice" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Level</label>
+                        <input type="number" id="prodStock" class="form-control" value="10" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Product Image (Phone / Desktop Native Capture)</label>
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:2rem; color:var(--gold-primary); margin-bottom:10px;"></i>
+                            <p style="font-size:0.8rem; color:var(--gray-muted);">Tap or Drop image file here to initiate storage upload tracking</p>
+                            <input type="file" id="prodImageFile" accept="image/*" style="display:none;">
+                            
+                            <div class="progress-container" id="progressBarContainer">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            <p id="uploadStatusMsg" style="font-size:0.8rem; margin-top:5px; font-weight:600;"></p>
+                        </div>
+                        <input type="hidden" id="prodImageUrl">
+                    </div>
+
+                    <button type="submit" class="btn-checkout-action" style="width:100%;">SAVE PRODUCT TO FIRESTORE</button>
+                </form>
+
+                <hr style="margin:40px 0; border:0; border-top:1px solid var(--gray-light);">
+                
+                <h3>Store Settings</h3>
+                <div class="form-group" style="margin-top:15px;">
+                    <label>WhatsApp Outbound Target Number</label>
+                    <input type="text" id="settingWhatsapp" class="form-control" placeholder="971500000000">
+                    <button id="saveSettingsBtn" class="btn-checkout-action" style="margin-top:10px; padding:8px;">Update Settings</button>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:20px; text-transform:uppercase;">Live Production Management Feed</h3>
+                <div id="adminCatalogList" style="display:flex; flex-direction:column; gap:15px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
