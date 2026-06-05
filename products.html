@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Collection - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="brand-logo">LORA</a>
+            <ul class="nav-links">
+                <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+                <li><a href="products.html" data-i18n="nav_shop">Shop</a></li>
+                <li><a href="wishlist.html" data-i18n="nav_wishlist">Wishlist</a></li>
+            </ul>
+            <div class="nav-icons">
+                <button class="lang-btn" id="langToggle">العربية</button>
+                <a href="cart.html" class="nav-icon-btn"><i class="fa-solid fa-bag-shopping"></i><span class="badge" id="cartCount">0</span></a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1 class="luxury-title" data-i18n="nav_shop">OUR COLLECTION</h1>
+        <div class="product-grid" id="allProductsContainer"></div>
+    </main>
+
+    <script type="module" src="products.js"></script>
+</body>
+</html>
