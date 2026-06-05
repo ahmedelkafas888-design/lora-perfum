@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - LORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Montserrat:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo">LORA CONTROL</a>
+            <button class="lang-btn" id="langToggle">العربية</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="admin-grid">
+            <div class="admin-form-card">
+                <h3 style="margin-bottom:15px; text-transform:uppercase;">Add Premium Perfume</h3>
+                <form id="adminNewProductForm">
+                    <div class="form-group"><label>Perfume Title</label><input type="text" id="pTitle" class="form-control" required></div>
+                    <div class="form-group">
+                        <label>Target Segment / Category</label>
+                        <select id="pCategory" class="form-control">
+                            <option value="men">Men</option>
+                            <option value="women">Women</option>
+                            <option value="unisex">Unisex</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Size Value (ML)</label><input type="number" id="pSize" class="form-control" value="100" required></div>
+                    <div class="form-group"><label>Original Base Price (EGP)</label><input type="number" id="pPrice" class="form-control" required></div>
+                    <div class="form-group"><label>Discounted Price (EGP) - Optional</label><input type="number" id="pDiscountPrice" class="form-control"></div>
+                    <div class="form-group"><label>Available Units in Stock</label><input type="number" id="pStock" class="form-control" value="10" required></div>
+                    
+                    <div class="form-group">
+                        <label>Persistent Storage Product Image</label>
+                        <div class="upload-zone" id="adminUploadDropzone">
+                            <i class="fa-solid fa-camera" style="font-size:1.8rem; color:var(--gold-primary); margin-bottom:5px;"></i>
+                            <p style="font-size:0.75rem; color:var(--gray-muted);">Tap to upload image file from local device storage</p>
+                            <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;">
+                            <div class="progress-container" id="uploadBarProgressContainer"><div class="progress-bar" id="uploadInlineProgressIndicator"></div></div>
+                            <p id="uploadLogString" style="font-size:0.75rem; font-weight:600; margin-top:5px;"></p>
+                        </div>
+                        <input type="hidden" id="finalizedProductImageUrl">
+                    </div>
+                    <button type="submit" class="btn-checkout-action" style="width:100%;">SAVE TO CLOUD STORAGE</button>
+                </form>
+
+                <hr style="margin:25px 0; border:0; border-top:1px solid var(--gray-light);">
+                
+                <h3 style="margin-bottom:12px; text-transform:uppercase;">Coupon Configurations</h3>
+                <div class="form-group"><label>Coupon Code Name</label><input type="text" id="couponCode" class="form-control" placeholder="E.G. GOLD20"></div>
+                <div class="form-group"><label>Discount Percentage Value (%)</label><input type="number" id="couponPercentage" class="form-control" placeholder="20"></div>
+                <button id="saveCouponBtn" class="btn-checkout-action" style="padding:8px 0; margin-bottom:20px;">DEPLOY ACTIVE COUPON</button>
+
+                <h3 style="margin-bottom:12px; text-transform:uppercase;">System Integrations Settings</h3>
+                <div class="form-group"><label>WhatsApp Target Integration Number</label><input type="text" id="whatsappSetting" class="form-control" placeholder="201000000000"></div>
+                <button id="saveSettingsBtn" class="btn-checkout-action" style="padding:8px 0;">COMMIT HARDWARE UPDATE</button>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom:15px; text-transform:uppercase;">Live Production Management Panel</h3>
+                <div id="adminCatalogDisplayList" style="display:flex; flex-direction:column; gap:12px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
